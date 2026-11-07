@@ -12,7 +12,7 @@
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
-            background-color: #1a0b14; /* ພື້ນຫຼັງໂທນສີຊົມພູເຂັ້ມ (Dark Pink Theme) */
+            background-color: #1a0b14;
             color: #f3f4f6;
             margin: 0;
             padding: 0;
@@ -34,27 +34,30 @@
             </div>
             <div>
                 <h1 class="font-bold text-sm tracking-wide text-pink-200">ແຊັດລັບສອງຄົນ</h1>
-                <p class="text-[10px] text-pink-400 flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span> ປອດໄພສູງສຸດ
+                <p id="partner-status" class="text-[10px] text-pink-400 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500" id="status-dot"></span> 
+                    <span id="status-text">ກຳລັງເຊື່ອມຕໍ່...</span>
                 </p>
             </div>
         </div>
 
-        <!-- ປຸ່ມໂທ (ສຽງ / ວິດີໂອ) ແລະ ລະຫັດຫ້ອງ -->
         <div class="flex items-center gap-2">
-            <!-- ປຸ່ມໂທສຽງ -->
-            <button onclick="startCall('audio')" class="bg-pink-600/20 hover:bg-pink-600/40 text-pink-300 p-2 rounded-xl transition border border-pink-500/30" title="ໂທສຽງ">
-                📞
-            </button>
-            <!-- ປຸ່ມໂທວິດີໂອ -->
-            <button onclick="startCall('video')" class="bg-pink-600/20 hover:bg-pink-600/40 text-pink-300 p-2 rounded-xl transition border border-pink-500/30" title="ໂທວິດີໂອ">
-                📹
-            </button>
+            <button onclick="startCall('audio')" class="bg-pink-600/25 hover:bg-pink-600/40 text-pink-300 p-2 rounded-xl transition border border-pink-500/30" title="ໂທສຽງ">📞</button>
+            <button onclick="startCall('video')" class="bg-pink-600/25 hover:bg-pink-600/40 text-pink-300 p-2 rounded-xl transition border border-pink-500/30" title="ໂທວິດີໂອ">📹</button>
             <div id="room-badge" class="hidden text-xs bg-pink-950/60 text-pink-200 px-2.5 py-1 rounded-full border border-pink-800/60">
                 ຫ້ອງ: <span id="current-room-id" class="font-mono text-pink-400 font-bold"></span>
             </div>
         </div>
     </header>
+
+    <!-- ແຖບສະແດງຂໍ້ຄວາມທີ່ຖືກປັກໝຸດ (Pinned Message Bar) -->
+    <div id="pinned-banner" class="hidden bg-pink-950/90 border-b border-pink-800/50 px-4 py-2 text-xs text-pink-200 flex justify-between items-center shrink-0 backdrop-blur-md z-10">
+        <div class="flex items-center gap-2 truncate">
+            <span class="text-pink-400 font-bold">📌 ປັກໝຸດ:</span>
+            <span id="pinned-text" class="truncate">ຍັງບໍ່ມີຂໍ້ຄວາມປັກໝຸດ</span>
+        </div>
+        <button onclick="unpinMessage()" class="text-pink-400 hover:text-red-400 text-[10px] ml-2 shrink-0">ຍົກເລີກ</button>
+    </div>
 
     <!-- ໜ້າຈໍຫຼັກ -->
     <div id="home-screen" class="flex-1 flex flex-col justify-center items-center p-6 max-w-md mx-auto w-full overflow-y-auto">
@@ -69,9 +72,6 @@
 
             <div class="space-y-3 pt-2">
                 <button onclick="createRoom()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-medium py-2.5 rounded-xl transition duration-200 shadow-lg shadow-pink-900/40 flex items-center justify-center gap-2 text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
                     ສ້າງຫ້ອງລັບ (ຮັບລະຫັດ 6 ຫຼັກ)
                 </button>
 
@@ -83,15 +83,13 @@
 
                 <div class="flex gap-2">
                     <input type="text" id="join-room-input" maxlength="6" placeholder="ລະຫັດ 6 ຕົວເລກ..." class="flex-1 bg-slate-950 border border-pink-900/50 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-pink-500 text-white placeholder-slate-600 uppercase font-mono tracking-widest text-center">
-                    <button onclick="joinRoom()" class="bg-pink-950/80 hover:bg-pink-900 text-pink-200 px-4 py-2.5 rounded-xl text-xs font-medium transition duration-200 border border-pink-800/50">
-                        ເຂົ້າຫ້ອງ
-                    </button>
+                    <button onclick="joinRoom()" class="bg-pink-950/80 hover:bg-pink-900 text-pink-200 px-4 py-2.5 rounded-xl text-xs font-medium transition duration-200 border border-pink-800/50">ເຂົ້າຫ້ອງ</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ໜ້າຈໍແຊັດ (ພື້ນຫຼັງໂທນສີຊົມພູອ່ອນໆ/ເຂັ້ມ) -->
+    <!-- ໜ້າຈໍແຊັດ -->
     <div id="chat-screen" class="hidden flex-1 flex flex-col w-full overflow-hidden relative bg-[#200d17]">
         <!-- ປະຫວັດຂໍ້ຄວາມ -->
         <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 pb-20"></div>
@@ -117,24 +115,14 @@
 
         <!-- ຟອມສົ່ງຂໍ້ຄວາມ -->
         <div class="p-3 bg-slate-900/90 border-t border-pink-900/40 shrink-0 flex items-center gap-2 backdrop-blur-md">
-            <button type="button" onclick="toggleAttachmentMenu()" class="bg-pink-950/60 hover:bg-pink-900 text-pink-300 p-2.5 rounded-xl transition border border-pink-800/40">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-            </button>
+            <button type="button" onclick="toggleAttachmentMenu()" class="bg-pink-950/60 hover:bg-pink-900 text-pink-300 p-2.5 rounded-xl transition border border-pink-800/40">➕</button>
 
             <form id="chat-form" onsubmit="sendMessage(event)" class="flex-1 flex gap-2">
-                <input type="text" id="message-input" placeholder="ພິມຂໍ້ຄວາມ..." autocomplete="off" class="flex-1 bg-slate-950 border border-pink-900/50 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-pink-500 text-white placeholder-slate-500">
+                <input type="text" id="message-input" placeholder="ພິມຂໍ້ຄວາມ..." autocomplete="off" oninput="updateTypingStatus(true)" onblur="updateTypingStatus(false)" class="flex-1 bg-slate-950 border border-pink-900/50 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-pink-500 text-white placeholder-slate-500">
                 
-                <button type="button" id="mic-btn" onclick="toggleVoiceRecording()" class="bg-pink-950/60 hover:bg-pink-900 text-pink-300 px-3 py-2.5 rounded-xl transition flex items-center justify-center border border-pink-800/40" title="ສົ່ງສຽງ">
-                    🎙️
-                </button>
+                <button type="button" id="mic-btn" onclick="toggleVoiceRecording()" class="bg-pink-950/60 hover:bg-pink-900 text-pink-300 px-3 py-2.5 rounded-xl transition flex items-center justify-center border border-pink-800/40" title="ສົ່ງສຽງ">🎙️</button>
 
-                <button type="submit" class="bg-pink-600 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-medium transition shadow-lg shadow-pink-900/40 flex items-center justify-center shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                </button>
+                <button type="submit" class="bg-pink-600 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-medium transition shadow-lg shadow-pink-900/40 flex items-center justify-center shrink-0">🚀</button>
             </form>
         </div>
     </div>
@@ -143,7 +131,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
         const firebaseConfig = {
@@ -163,6 +151,7 @@
 
         let currentRoomId = null;
         let unsubscribeMessages = null;
+        let unsubscribeRoom = null;
         let mediaRecorder;
         let audioChunks = [];
         let isRecording = false;
@@ -181,7 +170,13 @@
         window.createRoom = async function() {
             const roomId = Math.floor(100000 + Math.random() * 900000).toString();
             try {
-                await setDoc(doc(db, "rooms", roomId), { createdAt: serverTimestamp(), allowedDevices: [myDeviceId] });
+                await setDoc(doc(db, "rooms", roomId), { 
+                    createdAt: serverTimestamp(), 
+                    allowedDevices: [myDeviceId],
+                    typing: {},
+                    lastSeen: {},
+                    pinnedMessage: null
+                });
                 localStorage.setItem('active_room_id', roomId);
                 enterChatScreen(roomId);
             } catch (e) { alert("ສ້າງຫ້ອງບໍ່ໄດ້"); }
@@ -202,7 +197,8 @@
                     localStorage.removeItem('active_room_id');
                     return;
                 }
-                let devices = snap.data().allowedDevices || [];
+                let data = snap.data();
+                let devices = data.allowedDevices || [];
                 if (!devices.includes(myDeviceId)) {
                     if (devices.length >= 2) {
                         alert('❌ ຫ້ອງເຕັມແລ້ວ (2 ຄົນ)');
@@ -210,7 +206,7 @@
                         return;
                     }
                     devices.push(myDeviceId);
-                    await setDoc(roomRef, { allowedDevices: devices }, { merge: true });
+                    await updateDoc(roomRef, { allowedDevices: devices });
                 }
                 localStorage.setItem('active_room_id', roomId);
                 enterChatScreen(roomId);
@@ -223,13 +219,83 @@
             document.getElementById('chat-screen').classList.remove('hidden');
             document.getElementById('room-badge').classList.remove('hidden');
             document.getElementById('current-room-id').innerText = roomId;
+            
             loadMessages(roomId);
+            monitorRoomStatus(roomId);
+            updateOnlineStatus(true);
+
+            window.addEventListener('beforeunload', () => updateOnlineStatus(false));
         }
 
-        // ຟັງຊັນจำລອງການໂທ (ສຽງ/ວິດີໂອ)
-        window.startCall = function(type) {
-            const callType = type === 'audio' ? 'ໂທສຽງ 📞' : 'ໂທວິດີໂອ 📹';
-            alert(`📞 ກຳລັງເຊື່ອມຕໍ່ ${callType} ຫາກິກຂອງທ່ານ...`);
+        function monitorRoomStatus(roomId) {
+            const roomRef = doc(db, "rooms", roomId);
+            if (unsubscribeRoom) unsubscribeRoom();
+
+            unsubscribeRoom = onSnapshot(roomRef, (docSnap) => {
+                if (!docSnap.exists()) return;
+                const data = docSnap.data();
+                const typingObj = data.typing || {};
+                const lastSeenObj = data.lastSeen || {};
+                const pinned = data.pinnedMessage;
+
+                // ຈັດການສະແດງແຖບປັກໝຸດ
+                const banner = document.getElementById('pinned-banner');
+                const pinnedText = document.getElementById('pinned-text');
+                if (pinned) {
+                    banner.classList.remove('hidden');
+                    pinnedText.innerText = pinned;
+                } else {
+                    banner.classList.add('hidden');
+                }
+
+                let isPartnerTyping = false;
+                let partnerLastSeenTime = null;
+                let partnerOnline = false;
+
+                for (let devId in typingObj) {
+                    if (devId !== myDeviceId && typingObj[devId]) isPartnerTyping = true;
+                }
+                for (let devId in lastSeenObj) {
+                    if (devId !== myDeviceId) {
+                        partnerOnline = lastSeenObj[devId].online;
+                        partnerLastSeenTime = lastSeenObj[devId].time;
+                    }
+                }
+
+                const statusText = document.getElementById('status-text');
+                const statusDot = document.getElementById('status-dot');
+
+                if (isPartnerTyping) {
+                    statusText.innerText = "ກຳລັງພິມ...";
+                    statusDot.className = "w-1.5 h-1.5 rounded-full bg-pink-400 animate-ping";
+                } else if (partnerOnline) {
+                    statusText.innerText = "ອອນລາຍຢູ່";
+                    statusDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
+                } else if (partnerLastSeenTime) {
+                    const timeStr = partnerLastSeenTime.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    statusText.innerText = `ເຫັນລ່າສຸດ ${timeStr}`;
+                    statusDot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
+                } else {
+                    statusText.innerText = "ອອບລາຍ";
+                    statusDot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
+                }
+            });
+        }
+
+        async function updateOnlineStatus(isOnline) {
+            if (!currentRoomId) return;
+            try {
+                await updateDoc(doc(db, "rooms", currentRoomId), {
+                    [`lastSeen.${myDeviceId}`]: { online: isOnline, time: serverTimestamp() }
+                });
+            } catch (e) {}
+        }
+
+        window.updateTypingStatus = async function(isTyping) {
+            if (!currentRoomId) return;
+            try {
+                await updateDoc(doc(db, "rooms", currentRoomId), { [`typing.${myDeviceId}`]: isTyping });
+            } catch (e) {}
         }
 
         function loadMessages(roomId) {
@@ -256,116 +322,32 @@
                     if (data.type === 'audio') contentHTML = `<audio controls src="${data.url}" class="max-w-full h-10"></audio>`;
                     if (data.type === 'location') contentHTML = `<a href="${data.url}" target="_blank" class="text-pink-200 underline font-bold">📍 ເບິ່ງໂລເຄຊັນໃນແຜນທີ່</a>`;
 
+                    // ສະແດງ Reaction ຖ້າມີ
+                    let reactionsHTML = '';
+                    if (data.reactions) {
+                        for (let dev in data.reactions) {
+                            reactionsHTML += `<span class="bg-pink-950/80 border border-pink-800 text-[10px] px-1.5 py-0.5 rounded-full ml-1">${data.reactions[dev]}</span>`;
+                        }
+                    }
+
+                    let seenStatus = isMe ? (data.read ? '<span class="text-pink-300 font-bold ml-1">✓✓ ອ່ານແລ້ວ</span>' : '<span class="text-slate-400 ml-1">✓ ສົ່ງແລ້ວ</span>') : '';
+
+                    if (!isMe && !data.read) markAsRead(docId);
+
                     const msgDiv = document.createElement('div');
                     msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
                     msgDiv.innerHTML = `
-                        <div class="flex items-center gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}">
-                            <div class="max-w-[75%] rounded-2xl px-3.5 py-2 text-xs sm:text-sm ${isMe ? 'bg-pink-600 text-white rounded-br-none shadow-md' : 'bg-pink-950/80 text-pink-100 rounded-bl-none border border-pink-900/60'}">
+                        <div class="flex items-center gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'} group relative">
+                            <div class="max-w-[75%] rounded-2xl px-3.5 py-2 text-xs sm:text-sm ${isMe ? 'bg-pink-600 text-white rounded-br-none shadow-md' : 'bg-pink-950/80 text-pink-100 rounded-bl-none border border-pink-900/60'} relative">
                                 ${contentHTML}
+                                <div class="absolute -bottom-2 ${isMe ? 'left-0' : 'right-0'} flex">${reactionsHTML}</div>
                             </div>
-                            <button onclick="deleteMessage('${docId}')" class="text-pink-400/50 hover:text-red-400 text-xs opacity-60 transition p-1">🗑️</button>
-                        </div>
-                        <span class="text-[9px] text-pink-400/60 mt-0.5 px-1">${formatTime(data.createdAt)}</span>
-                    `;
-                    container.appendChild(msgDiv);
-                });
-                container.scrollTop = container.scrollHeight;
-            });
-        }
-
-        window.sendMessage = async function(event) {
-            event.preventDefault();
-            const input = document.getElementById('message-input');
-            const text = input.value.trim();
-            if (!text || !currentRoomId) return;
-            input.value = '';
-            await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
-                text: text, type: 'text', deviceId: myDeviceId, createdAt: serverTimestamp()
-            });
-        }
-
-        window.handleFileUpload = async function(event, type) {
-            const file = event.target.files[0];
-            if (!file || !currentRoomId) return;
-            toggleAttachmentMenu();
-            
-            const storageRef = ref(storage, `rooms/${currentRoomId}/${Date.now()}_${file.name}`);
-            try {
-                alert('ກຳລັງອັບໂຫຼດ...');
-                const snapshot = await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(snapshot.ref);
-
-                let fileType = 'file';
-                if (file.type.startsWith('image/')) fileType = 'image';
-                else if (file.type.startsWith('video/')) fileType = 'video';
-
-                await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
-                    url: url, fileName: file.name, type: fileType, deviceId: myDeviceId, createdAt: serverTimestamp()
-                });
-            } catch (e) { alert('ອັບໂຫຼດບໍ່ສຳເລັດ (ກະລຸນາເປີດ Firebase Storage Rules)'); }
-        }
-
-        window.sendLocation = function() {
-            toggleAttachmentMenu();
-            if (!navigator.geolocation) return alert('ບຣາວເຊີບໍ່ຮອງຮັບໂລເຄຊັນ');
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                const mapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-                await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
-                    url: mapUrl, type: 'location', deviceId: myDeviceId, createdAt: serverTimestamp()
-                });
-            }, () => alert('ບໍ່ສາມາດດຶງໂລເຄຊັນໄດ້'));
-        }
-
-        window.toggleVoiceRecording = async function() {
-            const btn = document.getElementById('mic-btn');
-            if (!isRecording) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
-                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                    mediaRecorder.onstop = async () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const storageRef = ref(storage, `rooms/${currentRoomId}/audio_${Date.now()}.webm`);
-                        const snapshot = await uploadBytes(storageRef, audioBlob);
-                        const url = await getDownloadURL(snapshot.ref);
-                        await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
-                            url: url, type: 'audio', deviceId: myDeviceId, createdAt: serverTimestamp()
-                        });
-                    };
-                    mediaRecorder.start();
-                    isRecording = true;
-                    btn.classList.add('bg-red-600', 'text-white');
-                    btn.innerText = '⏹️';
-                } catch (e) { alert('ບໍ່ສາມາດເຂົ້າເຖິງไมໂຄຣໂຟນໄດ້'); }
-            } else {
-                mediaRecorder.stop();
-                isRecording = false;
-                btn.classList.remove('bg-red-600', 'text-white');
-                btn.innerText = '🎙️';
-            }
-        }
-
-        window.deleteMessage = async function(id) {
-            if (currentRoomId) await deleteDoc(doc(db, "rooms", currentRoomId, "messages", id));
-        }
-
-        window.toggleAttachmentMenu = function() {
-            const menu = document.getElementById('attachment-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-
-        function formatTime(timestamp) {
-            if (!timestamp) return 'ກຳລັງສົ່ງ...';
-            return timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-    </script>
-</body>
-</html>
+                            
+                            <!-- ປຸ່ມເມນູຍ່ອຍ (ລົບ, ປັກໝຸດ, ສະແດງຄວາມຮູ້ສຶກ) -->
+                            <div class="flex items-center gap-1 opacity-80 sm:opacity-0 group-hover:opacity-100 transition">
+                                <button onclick="reactMessage('${docId}', '❤️')" title="ຖືກໃຈ">❤️</button>
+                                <button onclick="reactMessage('${docId}', '😂')" title="ຫົວ">😂</button>
+                                <button onclick="pinMessage('${escapeHtml(data.text || 'ໄຟລ໌/ມີເດຍ')}')" title="ປັກໝຸດ">📌</button>
+                                <button onclick="deleteMessage('${docId}')" class="text-red-400" title="ລົບ">🗑️</button>
+                            </div>
+ 
