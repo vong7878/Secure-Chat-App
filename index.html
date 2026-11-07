@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ແຊັດລັບປອດໄພສູງ - Secure Chat</title>
+    <title>ແຊັດລັບສຳລັບສອງຄົນ - Secure Private Chat</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* ປ້ອງກັນການຄັດລອກຂໍ້ຄວາມ ແລະ ເລືອກຂໍ້ຄວາມ */
         body {
             user-select: none;
             -webkit-user-select: none;
@@ -16,7 +15,6 @@
             background-color: #0b0f19;
             color: #f3f4f6;
         }
-        /* ເອັບເຟັກມົວໜ້າຈໍເວລາອອກຈາກແອັບ ຫຼື ພະຍາຍາມແຄັບ (ຖ້າບຣາວເຊີຮອງຮັບ) */
         .secure-overlay {
             -webkit-touch-callout: none;
         }
@@ -27,71 +25,66 @@
     <!-- ຫົວຂໍ້ແອັບ -->
     <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center shadow-md z-10">
         <div class="flex items-center space-x-3">
-            <div class="bg-emerald-600 p-2 rounded-xl text-white">
+            <div class="bg-pink-600 p-2 rounded-xl text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
             </div>
             <div>
-                <h1 class="font-bold text-lg tracking-wide">ແຊັດລັບປອດໄພສູງ</h1>
-                <p class="text-xs text-emerald-400 flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ລະບົບເຂົ້າລະຫັດປາຍທາງ
+                <h1 class="font-bold text-lg tracking-wide">ແຊັດລັບສອງຄົນ</h1>
+                <p class="text-xs text-pink-400 flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span> ປອດໄພສູງสุด (2 คนເທົ່ານັ້ນ)
                 </p>
             </div>
         </div>
         <div id="room-badge" class="hidden text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700">
-            ຫ້ອງ: <span id="current-room-id" class="font-mono text-emerald-400"></span>
+            ລະຫັດຫ້ອງ: <span id="current-room-id" class="font-mono text-pink-400 font-bold text-sm"></span>
         </div>
     </header>
 
-    <!-- ໜ້າຈໍຫຼັກ (ເລືອກສ້າງ ຫຼື ເຂົ້າຫ້ອງ) -->
+    <!-- ໜ້າຈໍຫຼັກ -->
     <div id="home-screen" class="flex-1 flex flex-col justify-center items-center p-6 max-w-md mx-auto w-full">
         <div class="bg-slate-900/80 border border-slate-800 p-8 rounded-2xl shadow-2xl w-full text-center space-y-6 backdrop-blur-md">
-            <div class="inline-block p-4 bg-emerald-500/10 text-emerald-400 rounded-full mb-2">
+            <div class="inline-block p-4 bg-pink-500/10 text-pink-400 rounded-full mb-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
             </div>
-            <h2 class="text-xl font-bold">ຍິນດີຕ้อนรับສູ່ລະບົບແຊັດລັບ</h2>
-            <p class="text-sm text-slate-400">ບໍ່ມີການບັນທຶກປະຫວັດຖາວອນ, ຂໍ້ຄວາມຖືກປົກປ້ອງຄວາມເປັນສ່ວນຕົວຢ່າງເຂັ້ມງວດ.</p>
+            <h2 class="text-xl font-bold">พื้นที่ສ່ວນຕົວ</h2>
+            <p class="text-sm text-slate-400">ສຳລັບທ່ານ ແລະ ກິກຂອງທ່ານເທົ່ານັ້ນ (1 ລະຫັດ ຕໍ່ 2 ເຄື່ອງ)</p>
 
             <div class="space-y-4 pt-4">
-                <button onclick="createRoom()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition duration-200 shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2">
+                <button onclick="createRoom()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-medium py-3 rounded-xl transition duration-200 shadow-lg shadow-pink-900/30 flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    ສ້າງຫ້ອງແຊັດໃໝ່
+                    ສ້າງຫ້ອງລັບ (ຮັບລະຫັດ 6 ຫຼັກ)
                 </button>
 
                 <div class="relative flex py-2 items-center">
                     <div class="flex-grow border-t border-slate-800"></div>
-                    <span class="flex-shrink mx-4 text-slate-500 text-xs">ຫຼື</span>
+                    <span class="flex-shrink mx-4 text-slate-500 text-xs">ຫຼື ໃສ່ລະຫັດເຂົ້າຮ່ວມ</span>
                     <div class="flex-grow border-t border-slate-800"></div>
                 </div>
 
                 <div class="flex gap-2">
-                    <input type="text" id="join-room-input" placeholder="ລະຫັດຫ້ອງແຊັດ..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 text-white placeholder-slate-600">
+                    <input type="text" id="join-room-input" maxlength="6" placeholder="ລະຫັດ 6 ຕົວເລກ..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 text-white placeholder-slate-600 uppercase font-mono tracking-widest text-center">
                     <button onclick="joinRoom()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-3 rounded-xl text-sm font-medium transition duration-200 border border-slate-700">
-                        ເຂົ້າຮ່ວມ
+                        ເຂົ້າຫ້ອງ
                     </button>
                 </div>
             </div>
         </div>
-        <p class="text-xs text-slate-500 mt-6 text-center">⚠️ ຫ້າມແຄັບໜ້າຈໍ ແລະ ລະບົບປ້ອງກັນການຄັດລອກຖືກເປີດໃຊ້ງານແລ້ວ.</p>
     </div>
 
-    <!-- ໜ້າຈໍແຊັດ (ซ่อนໄວ້ກ່ອນຈົນกว่าຈະເຂົ້າຫ້ອງ) -->
+    <!-- ໜ້າຈໍແຊັດ -->
     <div id="chat-screen" class="hidden flex-1 flex flex-col max-w-4xl mx-auto w-full overflow-hidden">
-        <!-- รายการຂໍ້ຄວາມ -->
-        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4">
-            <!-- ຂໍ້ຄວາມຈະຖືກໂຫຼດເຂົ້າມາບ່ອນນີ້ -->
-        </div>
+        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
 
-        <!-- ຟອມສົ່ງຂໍ້ຄວາມ -->
         <div class="p-4 bg-slate-900 border-t border-slate-800">
             <form id="chat-form" onsubmit="sendMessage(event)" class="flex gap-2">
-                <input type="text" id="message-input" placeholder="ພິມຂໍ້ຄວາມລັບຂອງທ່ານ..." autocomplete="off" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 text-white placeholder-slate-600">
-                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-medium transition duration-200 shadow-lg shadow-emerald-900/35 flex items-center justify-center">
+                <input type="text" id="message-input" placeholder="ພິມຂໍ້ຄວາມ..." autocomplete="off" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 text-white placeholder-slate-600">
+                <button type="submit" class="bg-pink-600 hover:bg-pink-500 text-white px-6 py-3 rounded-xl font-medium transition duration-200 shadow-lg shadow-pink-900/35 flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
@@ -100,19 +93,11 @@
         </div>
     </div>
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex justify-center items-center">
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl flex items-center gap-4">
-            <div class="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-            <span id="loading-text" class="text-sm font-medium">ກຳລັງເຊື່ອມຕໍ່ລະບົບ...</span>
-        </div>
-    </div>
-
-    <!-- Firebase SDK Script -->
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDb, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFYd918wJZDjGL5Lv1B5boB4D5f7DdT3Y",
@@ -128,26 +113,95 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // ຕົວແปร global ສຳລັບຈັດການຫ້ອງ
         let currentRoomId = null;
         let unsubscribeMessages = null;
-        const myUserId = 'user_' + Math.random().toString(36).substr(2, 9);
 
-        window.createRoom = function() {
-            const roomId = Math.random().toString(36).substr(2, 6).toUpperCase();
-            enterRoom(roomId);
+        // ສ້າງ Unique Device ID ໃຫ້ມືຖືແຕ່ລະເຄື່ອງ (ຈື່ໄວ້ຕະຫຼອດ)
+        let myDeviceId = localStorage.getItem('secure_device_id');
+        if (!myDeviceId) {
+            myDeviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('secure_device_id', myDeviceId);
         }
 
+        // ตรวจสอบว่าเคยเข้าຫ້ອງໃດໄວ້ແລ້ວບໍ່ (Auto Login / ຈື່ເຄື່ອງ)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedRoom = localStorage.getItem('active_room_id');
+            if (savedRoom) {
+                verifyAndEnterRoom(savedRoom, true);
+            }
+        });
+
+        // 1. ສ້າງຫ້ອງໃໝ່ (ໄດ້ລະຫັດ 6 ຕົວເລກ)
+        window.createRoom = async function() {
+            const roomId = Math.floor(100000 + Math.random() * 900000).toString(); // ສ້າງເລກ 6 ຫຼັກ
+            const roomRef = doc(db, "rooms", roomId);
+            
+            try {
+                await setDoc(roomRef, {
+                    createdAt: serverTimestamp(),
+                    allowedDevices: [myDeviceId] // ບັນທຶກເຄື່ອງເຈົ້າຂອງຫ້ອງເປັນຄົນທຳອິດ
+                });
+                localStorage.setItem('active_room_id', roomId);
+                enterChatScreen(roomId);
+            } catch (error) {
+                console.error(error);
+                alert("ເກີດข้อผิดพลาดในการສ້າງຫ້ອງ");
+            }
+        }
+
+        // 2. ເຂົ້າຫ້ອງດ້ວຍລະຫັດ 6 ຕົວ
         window.joinRoom = function() {
-            const inputId = document.getElementById('join-room-input').value.trim().toUpperCase();
-            if (!inputId) {
-                alert('ກະລຸນາໃສ່ລະຫັດຫ້ອງກ່ອນ!');
+            const roomId = document.getElementById('join-room-input').value.trim();
+            if (roomId.length !== 6) {
+                alert('ກະລຸນາໃສ່ລະຫັດ ໃຫ້ครบ 6 ຕົວເລກ!');
                 return;
             }
-            enterRoom(inputId);
+            verifyAndEnterRoom(roomId, false);
         }
 
-        function enterRoom(roomId) {
+        // ຟັງຊັນກວດສອບສິດ (ຈຳກັດ 2 ເຄື່ອງ)
+        async function verifyAndEnterRoom(roomId, isAuto) {
+            const roomRef = doc(db, "rooms", roomId);
+            try {
+                const roomSnap = await getDoc(roomRef);
+                
+                if (!roomSnap.exists()) {
+                    if (!isAuto) alert('ບໍ່ພົບລະຫັດຫ້ອງນີ້ ຫຼື ຫ້ອງຖືກປິດໄປແລ້ວ!');
+                    localStorage.removeItem('active_room_id');
+                    return;
+                }
+
+                const data = roomSnap.data();
+                let devices = data.allowedDevices || [];
+
+                // ຖ້າເຄື່ອງນີ້ເຄີຍເຂົ້າແລ້ວ ໃຫ້ຜ່ານເລີຍ
+                if (devices.includes(myDeviceId)) {
+                    localStorage.setItem('active_room_id', roomId);
+                    enterChatScreen(roomId);
+                    return;
+                }
+
+                // ຖ້າຫ້ອງເຕັມແລ້ວ (ມີຄົບ 2 ເຄື່ອງແລ້ວ) ຫ້າມເຂົ້າ!
+                if (devices.length >= 2) {
+                    alert('❌ ຫ້ອງນີ້ເຕັມແລ້ວ! (จำກັດພຽງ 2 คนເທົ່ານັ້ນ ບໍ່ສາມາດເຂົ້າເພີ່ມໄດ້)');
+                    localStorage.removeItem('active_room_id');
+                    return;
+                }
+
+                // ຖ້າຫ້ອງຍັງว่าง (ເຄື່ອງທີ 2 ທີ່ກຳລັງເຂົ້າ - ກິກຂອງທ່ານ) ໃຫ້ບັນທຶກອຸປະກອນ
+                devices.push(myDeviceId);
+                await setDoc(roomRef, { allowedDevices: devices }, { merge: true });
+                
+                localStorage.setItem('active_room_id', roomId);
+                enterChatScreen(roomId);
+
+            } catch (error) {
+                console.error(error);
+                if (!isAuto) alert('ເຊື່ອມຕໍ່ລະບົບຜິດพลาด');
+            }
+        }
+
+        function enterChatScreen(roomId) {
             currentRoomId = roomId;
             document.getElementById('home-screen').classList.add('hidden');
             document.getElementById('chat-screen').classList.remove('hidden');
@@ -159,7 +213,6 @@
 
         function loadMessages(roomId) {
             const q = query(collection(db, "rooms", roomId, "messages"), orderBy("createdAt", "asc"));
-            
             if (unsubscribeMessages) unsubscribeMessages();
 
             unsubscribeMessages = onSnapshot(q, (snapshot) => {
@@ -167,19 +220,19 @@
                 container.innerHTML = '';
                 
                 if (snapshot.empty) {
-                    container.innerHTML = `<div class="text-center text-slate-500 text-xs my-auto py-10">ຫ້ອງນີ້ຍังไม่มีຂໍ້ຄວາມ. เริ่มສົ່ງຂໍ້ຄວາມທຳອິດເລີຍ!</div>`;
+                    container.innerHTML = `<div class="text-center text-slate-500 text-xs my-auto py-10">ເລີ່ມຕົ້ນສົນທະນາກັນເລີຍ...</div>`;
                     return;
                 }
 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    const isMe = data.senderId === myUserId;
+                    const isMe = data.deviceId === myDeviceId;
                     
                     const msgDiv = document.createElement('div');
                     msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
                     
                     msgDiv.innerHTML = `
-                        <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-emerald-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700'}">
+                        <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-pink-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700'}">
                             <p class="select-none">${escapeHtml(data.text)}</p>
                         </div>
                         <span class="text-[10px] text-slate-500 mt-1 px-1">${formatTime(data.createdAt)}</span>
@@ -200,12 +253,11 @@
             try {
                 await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
                     text: text,
-                    senderId: myUserId,
+                    deviceId: myDeviceId,
                     createdAt: serverTimestamp()
                 });
             } catch (error) {
-                console.error("Error sending message: ", error);
-                alert("ສົ່ງຂໍ້ຄວາມບໍ່สำเร็จ ກະລຸນາລองใหມ່");
+                console.error(error);
             }
         }
 
@@ -221,7 +273,7 @@
         }
     </script>
 
-    <!-- Script ປ້ອງກັນການຄັດລອກ ແລະ ຄລິກຂວາ -->
+    <!-- Script ປ້ອງກັນການແຄັບ/ຄັດລອກ -->
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', event => {
