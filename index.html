@@ -2,7 +2,7 @@
 <html lang="lo">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ແຊັດລັບສຳລັບສອງຄົນ - Secure Private Chat</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -12,64 +12,78 @@
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
-            background-color: #0b0f19;
+            background-color: #1a0b14; /* ພື້ນຫຼັງໂທນສີຊົມພູເຂັ້ມ (Dark Pink Theme) */
             color: #f3f4f6;
+            margin: 0;
+            padding: 0;
         }
         .secure-overlay {
             -webkit-touch-callout: none;
         }
     </style>
 </head>
-<body class="secure-overlay flex flex-col h-screen overflow-hidden">
+<body class="secure-overlay flex flex-col h-[100dvh] overflow-hidden">
 
     <!-- ຫົວຂໍ້ແອັບ -->
-    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center shadow-md z-10">
-        <div class="flex items-center space-x-3">
-            <div class="bg-pink-600 p-2 rounded-xl text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <header class="bg-slate-900/90 border-b border-pink-900/50 p-3 flex justify-between items-center shadow-md shrink-0 z-10 backdrop-blur-md">
+        <div class="flex items-center space-x-2">
+            <div class="bg-pink-600 p-1.5 rounded-xl text-white shadow-lg shadow-pink-900/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
             </div>
             <div>
-                <h1 class="font-bold text-lg tracking-wide">ແຊັດລັບສອງຄົນ</h1>
-                <p class="text-xs text-pink-400 flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span> ປອດໄພສູງสุด (2 คนເທົ່ານັ້ນ)
+                <h1 class="font-bold text-sm tracking-wide text-pink-200">ແຊັດລັບສອງຄົນ</h1>
+                <p class="text-[10px] text-pink-400 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span> ປອດໄພສູງສຸດ
                 </p>
             </div>
         </div>
-        <div id="room-badge" class="hidden text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700">
-            ລະຫັດຫ້ອງ: <span id="current-room-id" class="font-mono text-pink-400 font-bold text-sm"></span>
+
+        <!-- ປຸ່ມໂທ (ສຽງ / ວິດີໂອ) ແລະ ລະຫັດຫ້ອງ -->
+        <div class="flex items-center gap-2">
+            <!-- ປຸ່ມໂທສຽງ -->
+            <button onclick="startCall('audio')" class="bg-pink-600/20 hover:bg-pink-600/40 text-pink-300 p-2 rounded-xl transition border border-pink-500/30" title="ໂທສຽງ">
+                📞
+            </button>
+            <!-- ປຸ່ມໂທວິດີໂອ -->
+            <button onclick="startCall('video')" class="bg-pink-600/20 hover:bg-pink-600/40 text-pink-300 p-2 rounded-xl transition border border-pink-500/30" title="ໂທວິດີໂອ">
+                📹
+            </button>
+            <div id="room-badge" class="hidden text-xs bg-pink-950/60 text-pink-200 px-2.5 py-1 rounded-full border border-pink-800/60">
+                ຫ້ອງ: <span id="current-room-id" class="font-mono text-pink-400 font-bold"></span>
+            </div>
         </div>
     </header>
 
     <!-- ໜ້າຈໍຫຼັກ -->
-    <div id="home-screen" class="flex-1 flex flex-col justify-center items-center p-6 max-w-md mx-auto w-full">
-        <div class="bg-slate-900/80 border border-slate-800 p-8 rounded-2xl shadow-2xl w-full text-center space-y-6 backdrop-blur-md">
-            <div class="inline-block p-4 bg-pink-500/10 text-pink-400 rounded-full mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div id="home-screen" class="flex-1 flex flex-col justify-center items-center p-6 max-w-md mx-auto w-full overflow-y-auto">
+        <div class="bg-slate-900/80 border border-pink-900/40 p-6 rounded-2xl shadow-2xl w-full text-center space-y-5 backdrop-blur-md">
+            <div class="inline-block p-3 bg-pink-500/10 text-pink-400 rounded-full mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
             </div>
-            <h2 class="text-xl font-bold">พื้นที่ສ່ວນຕົວ</h2>
-            <p class="text-sm text-slate-400">ສຳລັບທ່ານ ແລະ ກິກຂອງທ່ານເທົ່ານັ້ນ (1 ລະຫັດ ຕໍ່ 2 ເຄື່ອງ)</p>
+            <h2 class="text-lg font-bold text-pink-200">ພື້ນທີ່ສ່ວນຕົວ</h2>
+            <p class="text-xs text-slate-400">ສຳລັບທ່ານ ແລະ ກິກຂອງທ່ານເທົ່ານັ້ນ (1 ລະຫັດ ຕໍ່ 2 ເຄື່ອງ)</p>
 
-            <div class="space-y-4 pt-4">
-                <button onclick="createRoom()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-medium py-3 rounded-xl transition duration-200 shadow-lg shadow-pink-900/30 flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="space-y-3 pt-2">
+                <button onclick="createRoom()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-medium py-2.5 rounded-xl transition duration-200 shadow-lg shadow-pink-900/40 flex items-center justify-center gap-2 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     ສ້າງຫ້ອງລັບ (ຮັບລະຫັດ 6 ຫຼັກ)
                 </button>
 
-                <div class="relative flex py-2 items-center">
-                    <div class="flex-grow border-t border-slate-800"></div>
-                    <span class="flex-shrink mx-4 text-slate-500 text-xs">ຫຼື ໃສ່ລະຫັດເຂົ້າຮ່ວມ</span>
-                    <div class="flex-grow border-t border-slate-800"></div>
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-pink-900/40"></div>
+                    <span class="flex-shrink mx-3 text-slate-500 text-[10px]">ຫຼື ໃສ່ລະຫັດເຂົ້າຮ່ວມ</span>
+                    <div class="flex-grow border-t border-pink-900/40"></div>
                 </div>
 
                 <div class="flex gap-2">
-                    <input type="text" id="join-room-input" maxlength="6" placeholder="ລະຫັດ 6 ຕົວເລກ..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 text-white placeholder-slate-600 uppercase font-mono tracking-widest text-center">
-                    <button onclick="joinRoom()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-3 rounded-xl text-sm font-medium transition duration-200 border border-slate-700">
+                    <input type="text" id="join-room-input" maxlength="6" placeholder="ລະຫັດ 6 ຕົວເລກ..." class="flex-1 bg-slate-950 border border-pink-900/50 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-pink-500 text-white placeholder-slate-600 uppercase font-mono tracking-widest text-center">
+                    <button onclick="joinRoom()" class="bg-pink-950/80 hover:bg-pink-900 text-pink-200 px-4 py-2.5 rounded-xl text-xs font-medium transition duration-200 border border-pink-800/50">
                         ເຂົ້າຫ້ອງ
                     </button>
                 </div>
@@ -77,15 +91,47 @@
         </div>
     </div>
 
-    <!-- ໜ້າຈໍແຊັດ -->
-    <div id="chat-screen" class="hidden flex-1 flex flex-col max-w-4xl mx-auto w-full overflow-hidden">
-        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+    <!-- ໜ້າຈໍແຊັດ (ພື້ນຫຼັງໂທນສີຊົມພູອ່ອນໆ/ເຂັ້ມ) -->
+    <div id="chat-screen" class="hidden flex-1 flex flex-col w-full overflow-hidden relative bg-[#200d17]">
+        <!-- ປະຫວັດຂໍ້ຄວາມ -->
+        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 pb-20"></div>
 
-        <div class="p-4 bg-slate-900 border-t border-slate-800">
-            <form id="chat-form" onsubmit="sendMessage(event)" class="flex gap-2">
-                <input type="text" id="message-input" placeholder="ພິມຂໍ້ຄວາມ..." autocomplete="off" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 text-white placeholder-slate-600">
-                <button type="submit" class="bg-pink-600 hover:bg-pink-500 text-white px-6 py-3 rounded-xl font-medium transition duration-200 shadow-lg shadow-pink-900/35 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- Pop-up ເມນູແນບໄຟລ໌ -->
+        <div id="attachment-menu" class="hidden absolute bottom-16 left-3 bg-slate-900 border border-pink-900/50 rounded-2xl p-3 shadow-2xl z-20 flex flex-col gap-2 w-48 backdrop-blur-md">
+            <label class="flex items-center gap-3 text-xs text-slate-200 hover:text-pink-400 cursor-pointer p-1.5 rounded-lg hover:bg-pink-950/50">
+                <span>📷 ຖ່າຍຮູບ / ວິດີໂອ</span>
+                <input type="file" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleFileUpload(event, 'media')">
+            </label>
+            <label class="flex items-center gap-3 text-xs text-slate-200 hover:text-pink-400 cursor-pointer p-1.5 rounded-lg hover:bg-pink-950/50">
+                <span>🖼️ ເລືອກຈາກແກເລີລີ</span>
+                <input type="file" accept="image/*,video/*" class="hidden" onchange="handleFileUpload(event, 'media')">
+            </label>
+            <label class="flex items-center gap-3 text-xs text-slate-200 hover:text-pink-400 cursor-pointer p-1.5 rounded-lg hover:bg-pink-950/50">
+                <span>📁 ແນບໄຟລ໌ທົ່ວໄປ</span>
+                <input type="file" class="hidden" onchange="handleFileUpload(event, 'file')">
+            </label>
+            <button onclick="sendLocation()" class="flex items-center gap-3 text-xs text-slate-200 hover:text-pink-400 cursor-pointer p-1.5 rounded-lg hover:bg-pink-950/50 text-left">
+                <span>📍 ສົ່ງໂລເຄຊັນ</span>
+            </button>
+        </div>
+
+        <!-- ຟອມສົ່ງຂໍ້ຄວາມ -->
+        <div class="p-3 bg-slate-900/90 border-t border-pink-900/40 shrink-0 flex items-center gap-2 backdrop-blur-md">
+            <button type="button" onclick="toggleAttachmentMenu()" class="bg-pink-950/60 hover:bg-pink-900 text-pink-300 p-2.5 rounded-xl transition border border-pink-800/40">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </button>
+
+            <form id="chat-form" onsubmit="sendMessage(event)" class="flex-1 flex gap-2">
+                <input type="text" id="message-input" placeholder="ພິມຂໍ້ຄວາມ..." autocomplete="off" class="flex-1 bg-slate-950 border border-pink-900/50 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-pink-500 text-white placeholder-slate-500">
+                
+                <button type="button" id="mic-btn" onclick="toggleVoiceRecording()" class="bg-pink-950/60 hover:bg-pink-900 text-pink-300 px-3 py-2.5 rounded-xl transition flex items-center justify-center border border-pink-800/40" title="ສົ່ງສຽງ">
+                    🎙️
+                </button>
+
+                <button type="submit" class="bg-pink-600 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-medium transition shadow-lg shadow-pink-900/40 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
                 </button>
@@ -97,7 +143,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDb, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFYd918wJZDjGL5Lv1B5boB4D5f7DdT3Y",
@@ -112,93 +159,62 @@
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         let currentRoomId = null;
         let unsubscribeMessages = null;
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
 
-        // ສ້າງ Unique Device ID ໃຫ້ມືຖືແຕ່ລະເຄື່ອງ (ຈື່ໄວ້ຕະຫຼອດ)
         let myDeviceId = localStorage.getItem('secure_device_id');
         if (!myDeviceId) {
             myDeviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('secure_device_id', myDeviceId);
         }
 
-        // ตรวจสอบว่าเคยเข้าຫ້ອງໃດໄວ້ແລ້ວບໍ່ (Auto Login / ຈື່ເຄື່ອງ)
         window.addEventListener('DOMContentLoaded', () => {
             const savedRoom = localStorage.getItem('active_room_id');
-            if (savedRoom) {
-                verifyAndEnterRoom(savedRoom, true);
-            }
+            if (savedRoom) verifyAndEnterRoom(savedRoom, true);
         });
 
-        // 1. ສ້າງຫ້ອງໃໝ່ (ໄດ້ລະຫັດ 6 ຕົວເລກ)
         window.createRoom = async function() {
-            const roomId = Math.floor(100000 + Math.random() * 900000).toString(); // ສ້າງເລກ 6 ຫຼັກ
-            const roomRef = doc(db, "rooms", roomId);
-            
+            const roomId = Math.floor(100000 + Math.random() * 900000).toString();
             try {
-                await setDoc(roomRef, {
-                    createdAt: serverTimestamp(),
-                    allowedDevices: [myDeviceId] // ບັນທຶກເຄື່ອງເຈົ້າຂອງຫ້ອງເປັນຄົນທຳອິດ
-                });
+                await setDoc(doc(db, "rooms", roomId), { createdAt: serverTimestamp(), allowedDevices: [myDeviceId] });
                 localStorage.setItem('active_room_id', roomId);
                 enterChatScreen(roomId);
-            } catch (error) {
-                console.error(error);
-                alert("ເກີດข้อผิดพลาดในการສ້າງຫ້ອງ");
-            }
+            } catch (e) { alert("ສ້າງຫ້ອງບໍ່ໄດ້"); }
         }
 
-        // 2. ເຂົ້າຫ້ອງດ້ວຍລະຫັດ 6 ຕົວ
         window.joinRoom = function() {
             const roomId = document.getElementById('join-room-input').value.trim();
-            if (roomId.length !== 6) {
-                alert('ກະລຸນາໃສ່ລະຫັດ ໃຫ້ครบ 6 ຕົວເລກ!');
-                return;
-            }
+            if (roomId.length !== 6) return alert('ກະລຸນາໃສ່ລະຫັດ 6 ຕົວ!');
             verifyAndEnterRoom(roomId, false);
         }
 
-        // ຟັງຊັນກວດສອບສິດ (ຈຳກັດ 2 ເຄື່ອງ)
         async function verifyAndEnterRoom(roomId, isAuto) {
             const roomRef = doc(db, "rooms", roomId);
             try {
-                const roomSnap = await getDoc(roomRef);
-                
-                if (!roomSnap.exists()) {
-                    if (!isAuto) alert('ບໍ່ພົບລະຫັດຫ້ອງນີ້ ຫຼື ຫ້ອງຖືກປິດໄປແລ້ວ!');
+                const snap = await getDoc(roomRef);
+                if (!snap.exists()) {
+                    if (!isAuto) alert('ບໍ່ພົບຫ້ອງ!');
                     localStorage.removeItem('active_room_id');
                     return;
                 }
-
-                const data = roomSnap.data();
-                let devices = data.allowedDevices || [];
-
-                // ຖ້າເຄື່ອງນີ້ເຄີຍເຂົ້າແລ້ວ ໃຫ້ຜ່ານເລີຍ
-                if (devices.includes(myDeviceId)) {
-                    localStorage.setItem('active_room_id', roomId);
-                    enterChatScreen(roomId);
-                    return;
+                let devices = snap.data().allowedDevices || [];
+                if (!devices.includes(myDeviceId)) {
+                    if (devices.length >= 2) {
+                        alert('❌ ຫ້ອງເຕັມແລ້ວ (2 ຄົນ)');
+                        localStorage.removeItem('active_room_id');
+                        return;
+                    }
+                    devices.push(myDeviceId);
+                    await setDoc(roomRef, { allowedDevices: devices }, { merge: true });
                 }
-
-                // ຖ້າຫ້ອງເຕັມແລ້ວ (ມີຄົບ 2 ເຄື່ອງແລ້ວ) ຫ້າມເຂົ້າ!
-                if (devices.length >= 2) {
-                    alert('❌ ຫ້ອງນີ້ເຕັມແລ້ວ! (จำກັດພຽງ 2 คนເທົ່ານັ້ນ ບໍ່ສາມາດເຂົ້າເພີ່ມໄດ້)');
-                    localStorage.removeItem('active_room_id');
-                    return;
-                }
-
-                // ຖ້າຫ້ອງຍັງว่าง (ເຄື່ອງທີ 2 ທີ່ກຳລັງເຂົ້າ - ກິກຂອງທ່ານ) ໃຫ້ບັນທຶກອຸປະກອນ
-                devices.push(myDeviceId);
-                await setDoc(roomRef, { allowedDevices: devices }, { merge: true });
-                
                 localStorage.setItem('active_room_id', roomId);
                 enterChatScreen(roomId);
-
-            } catch (error) {
-                console.error(error);
-                if (!isAuto) alert('ເຊື່ອມຕໍ່ລະບົບຜິດพลาด');
-            }
+            } catch (e) { console.error(e); }
         }
 
         function enterChatScreen(roomId) {
@@ -207,8 +223,13 @@
             document.getElementById('chat-screen').classList.remove('hidden');
             document.getElementById('room-badge').classList.remove('hidden');
             document.getElementById('current-room-id').innerText = roomId;
-
             loadMessages(roomId);
+        }
+
+        // ຟັງຊັນจำລອງການໂທ (ສຽງ/ວິດີໂອ)
+        window.startCall = function(type) {
+            const callType = type === 'audio' ? 'ໂທສຽງ 📞' : 'ໂທວິດີໂອ 📹';
+            alert(`📞 ກຳລັງເຊື່ອມຕໍ່ ${callType} ຫາກິກຂອງທ່ານ...`);
         }
 
         function loadMessages(roomId) {
@@ -218,24 +239,33 @@
             unsubscribeMessages = onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('messages-container');
                 container.innerHTML = '';
-                
                 if (snapshot.empty) {
-                    container.innerHTML = `<div class="text-center text-slate-500 text-xs my-auto py-10">ເລີ່ມຕົ້ນສົນທະນາກັນເລີຍ...</div>`;
+                    container.innerHTML = `<div class="text-center text-pink-400/60 text-xs my-auto py-10">ເລີ່ມຕົ້ນສົນທະນາກັນເລີຍ...</div>`;
                     return;
                 }
 
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const docId = docSnap.id;
                     const isMe = data.deviceId === myDeviceId;
                     
+                    let contentHTML = `<p class="select-none">${escapeHtml(data.text || '')}</p>`;
+                    if (data.type === 'image') contentHTML = `<a href="${data.url}" target="_blank"><img src="${data.url}" class="rounded-lg max-h-48 object-cover"></a>`;
+                    if (data.type === 'video') contentHTML = `<video controls src="${data.url}" class="rounded-lg max-h-48"></video>`;
+                    if (data.type === 'file') contentHTML = `<a href="${data.url}" target="_blank" class="underline text-pink-200">📁 ${escapeHtml(data.fileName)}</a>`;
+                    if (data.type === 'audio') contentHTML = `<audio controls src="${data.url}" class="max-w-full h-10"></audio>`;
+                    if (data.type === 'location') contentHTML = `<a href="${data.url}" target="_blank" class="text-pink-200 underline font-bold">📍 ເບິ່ງໂລເຄຊັນໃນແຜນທີ່</a>`;
+
                     const msgDiv = document.createElement('div');
                     msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
-                    
                     msgDiv.innerHTML = `
-                        <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-pink-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700'}">
-                            <p class="select-none">${escapeHtml(data.text)}</p>
+                        <div class="flex items-center gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}">
+                            <div class="max-w-[75%] rounded-2xl px-3.5 py-2 text-xs sm:text-sm ${isMe ? 'bg-pink-600 text-white rounded-br-none shadow-md' : 'bg-pink-950/80 text-pink-100 rounded-bl-none border border-pink-900/60'}">
+                                ${contentHTML}
+                            </div>
+                            <button onclick="deleteMessage('${docId}')" class="text-pink-400/50 hover:text-red-400 text-xs opacity-60 transition p-1">🗑️</button>
                         </div>
-                        <span class="text-[10px] text-slate-500 mt-1 px-1">${formatTime(data.createdAt)}</span>
+                        <span class="text-[9px] text-pink-400/60 mt-0.5 px-1">${formatTime(data.createdAt)}</span>
                     `;
                     container.appendChild(msgDiv);
                 });
@@ -248,40 +278,94 @@
             const input = document.getElementById('message-input');
             const text = input.value.trim();
             if (!text || !currentRoomId) return;
-
             input.value = '';
+            await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
+                text: text, type: 'text', deviceId: myDeviceId, createdAt: serverTimestamp()
+            });
+        }
+
+        window.handleFileUpload = async function(event, type) {
+            const file = event.target.files[0];
+            if (!file || !currentRoomId) return;
+            toggleAttachmentMenu();
+            
+            const storageRef = ref(storage, `rooms/${currentRoomId}/${Date.now()}_${file.name}`);
             try {
+                alert('ກຳລັງອັບໂຫຼດ...');
+                const snapshot = await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(snapshot.ref);
+
+                let fileType = 'file';
+                if (file.type.startsWith('image/')) fileType = 'image';
+                else if (file.type.startsWith('video/')) fileType = 'video';
+
                 await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
-                    text: text,
-                    deviceId: myDeviceId,
-                    createdAt: serverTimestamp()
+                    url: url, fileName: file.name, type: fileType, deviceId: myDeviceId, createdAt: serverTimestamp()
                 });
-            } catch (error) {
-                console.error(error);
+            } catch (e) { alert('ອັບໂຫຼດບໍ່ສຳເລັດ (ກະລຸນາເປີດ Firebase Storage Rules)'); }
+        }
+
+        window.sendLocation = function() {
+            toggleAttachmentMenu();
+            if (!navigator.geolocation) return alert('ບຣາວເຊີບໍ່ຮອງຮັບໂລເຄຊັນ');
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const mapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
+                    url: mapUrl, type: 'location', deviceId: myDeviceId, createdAt: serverTimestamp()
+                });
+            }, () => alert('ບໍ່ສາມາດດຶງໂລເຄຊັນໄດ້'));
+        }
+
+        window.toggleVoiceRecording = async function() {
+            const btn = document.getElementById('mic-btn');
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const storageRef = ref(storage, `rooms/${currentRoomId}/audio_${Date.now()}.webm`);
+                        const snapshot = await uploadBytes(storageRef, audioBlob);
+                        const url = await getDownloadURL(snapshot.ref);
+                        await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
+                            url: url, type: 'audio', deviceId: myDeviceId, createdAt: serverTimestamp()
+                        });
+                    };
+                    mediaRecorder.start();
+                    isRecording = true;
+                    btn.classList.add('bg-red-600', 'text-white');
+                    btn.innerText = '⏹️';
+                } catch (e) { alert('ບໍ່ສາມາດເຂົ້າເຖິງไมໂຄຣໂຟນໄດ້'); }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                btn.classList.remove('bg-red-600', 'text-white');
+                btn.innerText = '🎙️';
             }
+        }
+
+        window.deleteMessage = async function(id) {
+            if (currentRoomId) await deleteDoc(doc(db, "rooms", currentRoomId, "messages", id));
+        }
+
+        window.toggleAttachmentMenu = function() {
+            const menu = document.getElementById('attachment-menu');
+            menu.classList.toggle('hidden');
         }
 
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            return text.replace(/[&<>"']/g, m => map[m]);
         }
 
         function formatTime(timestamp) {
             if (!timestamp) return 'ກຳລັງສົ່ງ...';
-            const date = timestamp.toDate();
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
-    </script>
-
-    <!-- Script ປ້ອງກັນການແຄັບ/ຄັດລອກ -->
-    <script>
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('keydown', event => {
-            if (event.ctrlKey && (event.key === 'c' || event.key === 'u' || event.key === 's' || event.key === 'p')) {
-                event.preventDefault();
-                alert('ລະບົບຄວາມປອດໄພ: ຫ້າມຄັດລອກ ຫຼື ບັນທຶກໜ້າຈໍ!');
-            }
-        });
     </script>
 </body>
 </html>
