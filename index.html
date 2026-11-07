@@ -1,532 +1,234 @@
 <!DOCTYPE html>
-<html lang="lo" class="dark">
+<html lang="lo">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ແຊັດລັບປອດໄພສູງສຸດ - Ultra-Secure Chat</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#0b0f19',
-                        darkCard: '#111827',
-                        darkBorder: '#1f2937',
-                        accentGreen: '#10b981',
-                        accentRed: '#ef4444'
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>ແຊັດລັບປອດໄພສູງ - Secure Chat</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
+        /* ປ້ອງກັນການຄັດລອກຂໍ້ຄວາມ ແລະ ເລືອກຂໍ້ຄວາມ */
         body {
-            font-family: 'Noto Sans Lao', sans-serif;
+            user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
-            user-select: none;
+            background-color: #0b0f19;
+            color: #f3f4f6;
         }
-
-        /* Anti-copy / Anti-selection protection */
-        .no-select {
+        /* ເອັບເຟັກມົວໜ້າຈໍເວລາອອກຈາກແອັບ ຫຼື ພະຍາຍາມແຄັບ (ຖ້າບຣາວເຊີຮອງຮັບ) */
+        .secure-overlay {
             -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        /* Watermark overlay pattern */
-        .watermark-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 9999;
-            background-image: repeating-linear-gradient(
-                -45deg,
-                rgba(255, 255, 255, 0.03) 0px,
-                rgba(255, 255, 255, 0.03) 100px,
-                transparent 100px,
-                transparent 200px
-            );
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0b0f19;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1f2937;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #374151;
-        }
-
-        /* Privacy blur overlay when window loses focus */
-        #privacy-shield {
-            transition: opacity 0.2s ease;
         }
     </style>
 </head>
-<body class="bg-darkBg text-gray-100 h-screen overflow-hidden flex flex-col no-select">
+<body class="secure-overlay flex flex-col h-screen overflow-hidden">
 
-    <!-- Watermark Pattern Layer -->
-    <div class="watermark-overlay flex items-center justify-center overflow-hidden opacity-30">
-        <div id="watermark-text" class="text-xs text-gray-500 whitespace-nowrap transform -rotate-45 select-none pointer-events-none">
-            SECURE ENCRYPTED CHAT • NO SCREENSHOT • PRIVATE SESSION • 
-        </div>
-    </div>
-
-    <!-- Privacy Shield / Blur when tab/window inactive -->
-    <div id="privacy-shield" class="fixed inset-0 bg-darkBg/95 backdrop-blur-xl z-50 flex flex-col items-center justify-center p-6 text-center opacity-0 pointer-events-none transition-opacity">
-        <div class="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-3xl mb-4 border border-red-500/20 animate-pulse">
-            <i class="fa-solid fa-shield-halved"></i>
-        </div>
-        <h2 class="text-2xl font-bold text-white mb-2">ກຳລັງປົກປ້ອງຄວາມເປັນສ່ວນຕົວ</h2>
-        <p class="text-gray-400 max-w-md text-sm">ຈໍພາບຖືກບັງຊົ່ວຄາວ ເນື່ອງຈາກອອກຈາກໜ້າຕ່າງ ຫຼື ປ້ອງກັນການບັນທຶກໜ້າຈໍ.</p>
-    </div>
-
-    <!-- Custom Notification Modal (No alert()) -->
-    <div id="custom-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-darkCard border border-darkBorder rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
-            <div id="modal-icon" class="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border border-emerald-500/20">
-                <i class="fa-solid fa-check"></i>
+    <!-- ຫົວຂໍ້ແອັບ -->
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center shadow-md z-10">
+        <div class="flex items-center space-x-3">
+            <div class="bg-emerald-600 p-2 rounded-xl text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
             </div>
-            <h3 id="modal-title" class="text-lg font-bold text-white mb-2">ແຈ້ງເຕືອນ</h3>
-            <p id="modal-desc" class="text-gray-300 text-sm mb-6">ຂໍ້ຄວາມລາຍລະອຽດຢູ່ທີ່ນີ້...</p>
-            <button onclick="closeModal()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl transition shadow-lg shadow-emerald-600/20 cursor-pointer">
-                ຕົກລົງ
-            </button>
-        </div>
-    </div>
-
-    <!-- Main Container -->
-    <div id="app-container" class="flex-1 flex flex-col h-full max-w-4xl mx-auto w-full relative">
-
-        <!-- Header -->
-        <header class="bg-darkCard/80 backdrop-blur-md border-b border-darkBorder px-4 py-3 flex items-center justify-between z-10">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-600/20">
-                    <i class="fa-solid fa-user-secret text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-white text-sm md:text-base flex items-center gap-2">
-                        <span>ແຊັດລັບປອດໄພສູງສຸດ</span>
-                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-normal">
-                            <i class="fa-solid fa-lock text-[9px] mr-1"></i>ເຂົ້າລະຫັດປາຍທາງ
-                        </span>
-                    </h1>
-                    <p id="room-status-sub" class="text-xs text-gray-400">ຍັງບໍ່ໄດ້ເຊື່ອມຕໍ່ຫ້ອງ</p>
-                </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-wide">ແຊັດລັບປອດໄພສູງ</h1>
+                <p class="text-xs text-emerald-400 flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ລະບົບເຂົ້າລະຫັດປາຍທາງ
+                </p>
             </div>
+        </div>
+        <div id="room-badge" class="hidden text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700">
+            ຫ້ອງ: <span id="current-room-id" class="font-mono text-emerald-400"></span>
+        </div>
+    </header>
 
-            <div class="flex items-center space-x-2">
-                <button onclick="toggleInfoModal()" class="w-9 h-9 rounded-xl bg-darkBorder/50 hover:bg-darkBorder text-gray-300 flex items-center justify-center transition cursor-pointer" title="ກ່ຽວກັບລະບົບ">
-                    <i class="fa-solid fa-circle-info"></i>
+    <!-- ໜ້າຈໍຫຼັກ (ເລືອກສ້າງ ຫຼື ເຂົ້າຫ້ອງ) -->
+    <div id="home-screen" class="flex-1 flex flex-col justify-center items-center p-6 max-w-md mx-auto w-full">
+        <div class="bg-slate-900/80 border border-slate-800 p-8 rounded-2xl shadow-2xl w-full text-center space-y-6 backdrop-blur-md">
+            <div class="inline-block p-4 bg-emerald-500/10 text-emerald-400 rounded-full mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            </div>
+            <h2 class="text-xl font-bold">ຍິນດີຕ้อนรับສູ່ລະບົບແຊັດລັບ</h2>
+            <p class="text-sm text-slate-400">ບໍ່ມີການບັນທຶກປະຫວັດຖາວອນ, ຂໍ້ຄວາມຖືກປົກປ້ອງຄວາມເປັນສ່ວນຕົວຢ່າງເຂັ້ມງວດ.</p>
+
+            <div class="space-y-4 pt-4">
+                <button onclick="createRoom()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition duration-200 shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    ສ້າງຫ້ອງແຊັດໃໝ່
                 </button>
-                <button onclick="leaveRoom()" id="leave-btn" class="hidden px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-medium transition items-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-right-from-bracket"></i> ອອກຈາກຫ້ອງ
-                </button>
-            </div>
-        </header>
 
-        <!-- Room Lobby View -->
-        <div id="lobby-view" class="flex-1 flex items-center justify-center p-4">
-            <div class="bg-darkCard border border-darkBorder rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500"></div>
-                
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 border border-emerald-500/20">
-                        <i class="fa-solid fa-shield-keyhole"></i>
-                    </div>
-                    <h2 class="text-xl font-bold text-white mb-1">ເລີ່ມຕົ້ນສົນທະນາແບບເປັນສ່ວນຕົວ</h2>
-                    <p class="text-gray-400 text-xs">ສ້າງຫ້ອງໃໝ່ ຫຼື ໃສ່ລະຫັດລັບເພື່ອເຂົ້າຮ່ວມກັບຄູ່ສົນທະນາຂອງທ່ານທົ່ວໂລກ.</p>
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-slate-800"></div>
+                    <span class="flex-shrink mx-4 text-slate-500 text-xs">ຫຼື</span>
+                    <div class="flex-grow border-t border-slate-800"></div>
                 </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-400 mb-1.5">ຊື່ຫຼິ້ນຂອງທ່ານ (Alias)</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
-                                <i class="fa-solid fa-user"></i>
-                            </span>
-                            <input type="text" id="username-input" placeholder="ໃສ່ຊື່ຫຼິ້ນ..." maxlength="20" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 pl-10 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
-                        </div>
-                    </div>
-
-                    <div class="pt-2 border-t border-darkBorder">
-                        <label class="block text-xs font-medium text-gray-400 mb-1.5">ລະຫັດຫ້ອງ (Room Passcode)</label>
-                        <div class="flex gap-2">
-                            <div class="relative flex-1">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
-                                    <i class="fa-solid fa-key"></i>
-                                </span>
-                                <input type="text" id="room-code-input" placeholder="ຕົວຢ່າງ: secret-room-99" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 pl-10 text-sm text-white focus:outline-none focus:border-emerald-500 transition uppercase">
-                            </div>
-                            <button onclick="generateRandomCode()" class="bg-darkBorder hover:bg-gray-700 text-gray-300 px-3.5 rounded-xl text-xs transition cursor-pointer" title="ສ້າງລະຫັດແບບສຸ່ມ">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 pt-2">
-                        <button onclick="joinOrCreateRoom('create')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-sm transition shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-plus"></i> ສ້າງຫ້ອງໃໝ່
-                        </button>
-                        <button onclick="joinOrCreateRoom('join')" class="w-full py-3 bg-darkBorder hover:bg-gray-700 text-white font-medium rounded-xl text-sm transition cursor-pointer flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-right-to-bracket"></i> ເຂົ້າຮ່ວມຫ້ອງ
-                        </button>
-                    </div>
-                </div>
-
-                <div class="mt-6 pt-4 border-t border-darkBorder text-center">
-                    <p class="text-[11px] text-gray-500 flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
-                        ບໍ່ມີການບັນທຶກປະຫວັດຖາວອນ ຂໍ້ຄວາມຖືກປົກປ້ອງຄວາມເປັນສ່ວນຕົວ.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Room View -->
-        <div id="chat-view" class="flex-1 flex flex-col hidden overflow-hidden">
-            <!-- Messages Container -->
-            <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4">
-                <!-- Messages will load here -->
-            </div>
-
-            <!-- Typing indicator or security status bar -->
-            <div id="chat-notice" class="px-4 py-1.5 bg-darkCard/40 border-t border-darkBorder/50 text-[11px] text-gray-400 flex items-center justify-between">
-                <span class="flex items-center gap-1.5 text-emerald-400">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></i></span>
-                    ເຊື່ອມຕໍ່ລະບົບຄວາມປອດໄພສູງແລ້ວ
-                </span>
-                <span id="active-room-display" class="font-mono text-gray-500">ຫ້ອງ: ---</span>
-            </div>
-
-            <!-- Message Input Form -->
-            <div class="bg-darkCard border-t border-darkBorder p-3">
-                <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-center gap-2">
-                    <div class="relative flex-1">
-                        <input type="text" id="message-input" placeholder="ພิมพ์ຂໍ້ຄວາມລັບ..." autocomplete="off" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
-                    </div>
-                    <button type="submit" class="w-12 h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl flex items-center justify-center transition shadow-lg shadow-emerald-600/20 cursor-pointer flex-shrink-0">
-                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                <div class="flex gap-2">
+                    <input type="text" id="join-room-input" placeholder="ລະຫັດຫ້ອງແຊັດ..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 text-white placeholder-slate-600">
+                    <button onclick="joinRoom()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-3 rounded-xl text-sm font-medium transition duration-200 border border-slate-700">
+                        ເຂົ້າຮ່ວມ
                     </button>
-                </form>
+                </div>
             </div>
         </div>
-
+        <p class="text-xs text-slate-500 mt-6 text-center">⚠️ ຫ້າມແຄັບໜ້າຈໍ ແລະ ລະບົບປ້ອງກັນການຄັດລອກຖືກເປີດໃຊ້ງານແລ້ວ.</p>
     </div>
 
-    <!-- Info Modal -->
-    <div id="info-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-darkCard border border-darkBorder rounded-3xl p-6 max-w-md w-full shadow-2xl relative">
-            <div class="flex items-center justify-between mb-4 pb-3 border-b border-darkBorder">
-                <h3 class="font-bold text-white text-base flex items-center gap-2">
-                    <i class="fa-solid fa-shield-halved text-emerald-500"></i> ມາດຕະການຄວາມປອດໄພ
-                </h3>
-                <button onclick="toggleInfoModal()" class="text-gray-400 hover:text-white cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+    <!-- ໜ້າຈໍແຊັດ (ซ่อนໄວ້ກ່ອນຈົນกว่าຈະເຂົ້າຫ້ອງ) -->
+    <div id="chat-screen" class="hidden flex-1 flex flex-col max-w-4xl mx-auto w-full overflow-hidden">
+        <!-- รายการຂໍ້ຄວາມ -->
+        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <!-- ຂໍ້ຄວາມຈະຖືກໂຫຼດເຂົ້າມາບ່ອນນີ້ -->
+        </div>
+
+        <!-- ຟອມສົ່ງຂໍ້ຄວາມ -->
+        <div class="p-4 bg-slate-900 border-t border-slate-800">
+            <form id="chat-form" onsubmit="sendMessage(event)" class="flex gap-2">
+                <input type="text" id="message-input" placeholder="ພິມຂໍ້ຄວາມລັບຂອງທ່ານ..." autocomplete="off" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 text-white placeholder-slate-600">
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-medium transition duration-200 shadow-lg shadow-emerald-900/35 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
                 </button>
-            </div>
-            <div class="space-y-3 text-xs text-gray-300">
-                <div class="flex items-start gap-3 bg-darkBg p-3 rounded-xl border border-darkBorder">
-                    <i class="fa-solid fa-ban text-red-400 mt-0.5 text-sm"></i>
-                    <div>
-                        <strong class="text-white block mb-0.5">ປ້ອງກັນການຄັດລອກຂໍ້ຄວາມ</strong>
-                        ລະບົບປິດການໃຊ້ງານການຄັດລອກ (Copy/Paste) ແລະ ການຄລິກຂວາທັງໝົດ.
-                    </div>
-                </div>
-                <div class="flex items-start gap-3 bg-darkBg p-3 rounded-xl border border-darkBorder">
-                    <i class="fa-solid fa-eye-slash text-amber-400 mt-0.5 text-sm"></i>
-                    <div>
-                        <strong class="text-white block mb-0.5">ປ້ອງກັນການແຄັບໜ້າຈໍ</strong>
-                        ມີລາຍນ້ຳ (Watermark) ແລະ ລະບົບມົວໜ້າຈໍອັດຕະໂນມັດເມື່ອອອກຈາກໜ້າຕ່າງ.
-                    </div>
-                </div>
-                <div class="flex items-start gap-3 bg-darkBg p-3 rounded-xl border border-darkBorder">
-                    <i class="fa-solid fa-globe text-cyan-400 mt-0.5 text-sm"></i>
-                    <div>
-                        <strong class="text-white block mb-0.5">ເຊື່ອມຕໍ່ທົ່ວໂລກຜ່ານ Firebase</strong>
-                        ສົນທະນາແບບ Real-time ລະຫວ່າງ 2 ຄົນດ້ວຍລະຫັດຫ້ອງທີ່ປອດໄພ.
-                    </div>
-                </div>
-            </div>
-            <button onclick="toggleInfoModal()" class="w-full mt-5 py-3 bg-darkBorder hover:bg-gray-700 text-white font-medium rounded-xl text-xs transition cursor-pointer">
-                ຮັບຊາບແລ້ວ
-            </button>
+            </form>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex justify-center items-center">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl flex items-center gap-4">
+            <div class="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+            <span id="loading-text" class="text-sm font-medium">ກຳລັງເຊື່ອມຕໍ່ລະບົບ...</span>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Script -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, onSnapshot, orderBy, serverTimestamp, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-        // Global app configuration and variables
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ultra-secure-chat-v1';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFYd918wJZDjGL5Lv1B5boB4D5f7DdT3Y",
+            authDomain: "chatxx-14484.firebaseapp.com",
+            projectId: "chatxx-14484",
+            storageBucket: "chatxx-14484.firebasestorage.app",
+            messagingSenderId: "444865808493",
+            appId: "1:444865808493:web:a0e7134ab8c73876a7d764",
+            measurementId: "G-J590YREGXB"
+        };
 
-        let app, db, auth;
-        let currentUser = null;
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // ຕົວແปร global ສຳລັບຈັດການຫ້ອງ
         let currentRoomId = null;
         let unsubscribeMessages = null;
+        const myUserId = 'user_' + Math.random().toString(36).substr(2, 9);
 
-        // Initialize Firebase
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-
-            // Authenticate user
-            const initAuth = async () => {
-                try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                    currentUser = auth.currentUser;
-                } catch (err) {
-                    console.error("Auth error:", err);
-                }
-            };
-            initAuth();
-        } catch (e) {
-            console.error("Firebase init error:", e);
+        window.createRoom = function() {
+            const roomId = Math.random().toString(36).substr(2, 6).toUpperCase();
+            enterRoom(roomId);
         }
 
-        // Expose functions globally for UI handlers
-        window.generateRandomCode = function() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let code = '';
-            for (let i = 0; i < 6; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById('room-code-input').value = code;
-        };
-
-        window.showModal = function(title, desc, isSuccess = true) {
-            const modal = document.getElementById('custom-modal');
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
-            const iconDiv = document.getElementById('modal-icon');
-            if (isSuccess) {
-                iconDiv.className = "w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border border-emerald-500/20";
-                iconDiv.innerHTML = '<i class="fa-solid fa-check"></i>';
-            } else {
-                iconDiv.className = "w-14 h-14 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border border-red-500/20";
-                iconDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-            }
-            modal.classList.remove('hidden');
-        };
-
-        window.closeModal = function() {
-            document.getElementById('custom-modal').classList.add('hidden');
-        };
-
-        window.toggleInfoModal = function() {
-            const m = document.getElementById('info-modal');
-            m.classList.toggle('hidden');
-        };
-
-        window.joinOrCreateRoom = async function(mode) {
-            const username = document.getElementById('username-input').value.trim();
-            const roomCode = document.getElementById('room-code-input').value.trim().toUpperCase();
-
-            if (!username) {
-                window.showModal('ຜິດພາດ', 'ກະລຸນາໃສ່ຊື່ຫຼິ້ນຂອງທ່ານກ່ອນ!', false);
+        window.joinRoom = function() {
+            const inputId = document.getElementById('join-room-input').value.trim().toUpperCase();
+            if (!inputId) {
+                alert('ກະລຸນາໃສ່ລະຫັດຫ້ອງກ່ອນ!');
                 return;
             }
-            if (!roomCode || roomCode.length < 3) {
-                window.showModal('ຜິດພາດ', 'ກະລຸນາໃສ່ລະຫັດຫ້ອງຢ່າງໜ້ອຍ 3 ຕົວອັກສອນ!', false);
-                return;
-            }
+            enterRoom(inputId);
+        }
 
-            if (!currentUser) {
-                window.showModal('ກຳລັງໂຫຼດ', 'ກຳລັງເຊື່ອມຕໍ່ລະບົບ ຼກລຸນາລໍຖ້າ...', false);
-                return;
-            }
+        function enterRoom(roomId) {
+            currentRoomId = roomId;
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('chat-screen').classList.remove('hidden');
+            document.getElementById('room-badge').classList.remove('hidden');
+            document.getElementById('current-room-id').innerText = roomId;
 
-            currentRoomId = roomCode;
-            localStorage.setItem('secure_chat_username', username);
-            localStorage.setItem('secure_chat_room', roomCode);
+            loadMessages(roomId);
+        }
 
-            // Transition UI
-            document.getElementById('lobby-view').classList.add('hidden');
-            document.getElementById('chat-view').classList.remove('hidden');
-            document.getElementById('leave-btn').classList.remove('hidden');
-            document.getElementById('room-status-sub').innerText = `ຫ້ອງ: ${roomCode} | ສະມາຊິກ: ${username}`;
-            document.getElementById('active-room-display').innerText = `ຫ້ອງ ID: ${roomCode}`;
+        function loadMessages(roomId) {
+            const q = query(collection(db, "rooms", roomId, "messages"), orderBy("createdAt", "asc"));
+            
+            if (unsubscribeMessages) unsubscribeMessages();
 
-            // Load Messages
-            loadMessages();
-        };
+            unsubscribeMessages = onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('messages-container');
+                container.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="text-center text-slate-500 text-xs my-auto py-10">ຫ້ອງນີ້ຍังไม่มีຂໍ້ຄວາມ. เริ่มສົ່ງຂໍ້ຄວາມທຳອິດເລີຍ!</div>`;
+                    return;
+                }
 
-        window.leaveRoom = function() {
-            if (unsubscribeMessages) {
-                unsubscribeMessages();
-            }
-            currentRoomId = null;
-            document.getElementById('chat-view').classList.add('hidden');
-            document.getElementById('leave-btn').classList.add('hidden');
-            document.getElementById('lobby-view').classList.remove('hidden');
-            document.getElementById('room-status-sub').innerText = 'ຍັງບໍ່ໄດ້ເຊື່ອມຕໍ່ຫ້ອງ';
-            document.getElementById('messages-container').innerHTML = '';
-        };
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const isMe = data.senderId === myUserId;
+                    
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+                    
+                    msgDiv.innerHTML = `
+                        <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-emerald-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700'}">
+                            <p class="select-none">${escapeHtml(data.text)}</p>
+                        </div>
+                        <span class="text-[10px] text-slate-500 mt-1 px-1">${formatTime(data.createdAt)}</span>
+                    `;
+                    container.appendChild(msgDiv);
+                });
+                container.scrollTop = container.scrollHeight;
+            });
+        }
 
-        window.sendMessage = async function(e) {
-            e.preventDefault();
+        window.sendMessage = async function(event) {
+            event.preventDefault();
             const input = document.getElementById('message-input');
             const text = input.value.trim();
-            if (!text || !currentRoomId || !currentUser) return;
+            if (!text || !currentRoomId) return;
 
-            const username = localStorage.getItem('secure_chat_username') || 'Anonymous';
-
+            input.value = '';
             try {
-                // Rule 1: /artifacts/{appId}/public/data/{collectionName}
-                const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', `room_${currentRoomId}_messages`);
-                
-                await addDoc(messagesRef, {
-                    senderId: currentUser.uid,
-                    senderName: username,
+                await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
                     text: text,
-                    timestamp: serverTimestamp()
+                    senderId: myUserId,
+                    createdAt: serverTimestamp()
                 });
-
-                input.value = '';
-            } catch (err) {
-                console.error("Error sending message:", err);
-                window.showModal('ສົ່ງຂໍ້ຄວາມບໍ່ສຳເລັດ', 'ກະລຸນາລອງใหມ່ອີກຄັ້ງ', false);
-            }
-        };
-
-        function loadMessages() {
-            if (!currentRoomId) return;
-
-            const container = document.getElementById('messages-container');
-            container.innerHTML = '<div class="text-center text-xs text-gray-500 py-4"><i class="fa-solid fa-spinner fa-spin mr-1"></i> ກຳລັງໂຫຼດຂໍ້ຄວາມ...</div>';
-
-            try {
-                // Rule 1 path
-                const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', `room_${currentRoomId}_messages`);
-                
-                // Rule 2: No complex queries with multiple wheres or orderBys requiring custom index unless simple or fetched safely.
-                // We'll fetch all documents in the collection and sort them in JS memory to avoid compound index requirements.
-                unsubscribeMessages = onSnapshot(messagesRef, (snapshot) => {
-                    const messages = [];
-                    snapshot.forEach(docSnap => {
-                        messages.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-
-                    // Sort in memory by timestamp ascending
-                    messages.sort((a, b) => {
-                        const t1 = a.timestamp?.toMillis ? a.timestamp.toMillis() : (a.timestamp?.seconds ? a.timestamp.seconds * 1000 : 0);
-                        const t2 = b.timestamp?.toMillis ? b.timestamp.toMillis() : (b.timestamp?.seconds ? b.timestamp.seconds * 1000 : 0);
-                        return t1 - t2;
-                    });
-
-                    container.innerHTML = '';
-                    if (messages.length === 0) {
-                        container.innerHTML = `
-                            <div class="h-full flex flex-col items-center justify-center text-center p-6 text-gray-500">
-                                <div class="w-12 h-12 rounded-2xl bg-darkBorder/30 flex items-center justify-center text-xl mb-2 text-gray-400">
-                                    <i class="fa-solid fa-comments"></i>
-                                </div>
-                                <p class="text-xs">ຍັງບໍ່ມີຂໍ້ຄວາມໃນຫ້ອງນີ້ ເລີ່ມຕົ້ນສົນທະນາເລີຍ!</p>
-                            </div>`;
-                        return;
-                    }
-
-                    messages.forEach(msg => {
-                        const isMe = currentUser && msg.senderId === currentUser.uid;
-                        const timeStr = msg.timestamp?.toMillis ? new Date(msg.timestamp.toMillis()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'ເມື່ອສັກครู่';
-
-                        const msgDiv = document.createElement('div');
-                        msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3`;
-                        
-                        msgDiv.innerHTML = `
-                            <div class="flex items-center gap-1.5 mb-1 text-[11px] text-gray-400">
-                                <span class="font-medium text-gray-300">${escapeHtml(msg.senderName)}</span>
-                                <span class="text-[10px] text-gray-500">${timeStr}</span>
-                            </div>
-                            <div class="max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${isMe ? 'bg-emerald-600 text-white rounded-br-none shadow-md shadow-emerald-600/10' : 'bg-darkCard border border-darkBorder text-gray-100 rounded-bl-none'} select-none">
-                                ${escapeHtml(msg.text)}
-                            </div>
-                        `;
-                        container.appendChild(msgDiv);
-                    });
-
-                    container.scrollTop = container.scrollHeight;
-                }, (error) => {
-                    console.error("Snapshot error:", error);
-                });
-
-            } catch (err) {
-                console.error("Error loading messages:", err);
+            } catch (error) {
+                console.error("Error sending message: ", error);
+                alert("ສົ່ງຂໍ້ຄວາມບໍ່สำเร็จ ກະລຸນາລองใหມ່");
             }
         }
 
         function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
-        // Anti-Copy & Anti-Screenshot security guards
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('copy', e => {
-            e.preventDefault();
-            window.showModal('ແຈ້ງເຕືອນຄວາມປອດໄພ', 'ລະບົບປ້ອງກັນຄວາມເປັນສ່ວນຕົວ: ຫ້າມຄັດລອກຂໍ້ຄວາມ!', false);
-        });
-        document.addEventListener('cut', e => e.preventDefault());
-        document.addEventListener('paste', e => e.preventDefault());
+        function formatTime(timestamp) {
+            if (!timestamp) return 'ກຳລັງສົ່ງ...';
+            const date = timestamp.toDate();
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+    </script>
 
-        // Keyboard shortcut blocking (Ctrl+C, Ctrl+P, PrintScreen simulation attempt)
-        document.addEventListener('keydown', e => {
-            if (e.ctrlKey && (e.key === 'c' || e.key === 'u' || e.key === 'p' || e.key === 's')) {
-                e.preventDefault();
-                window.showModal('ແຈ້ງເຕືອນຄວາມປອດໄພ', 'ຄຳສັ່ງນີ້ຖືກປິດກັ້ນເພື່ອຄວາມປອດໄພສູງສຸດ.', false);
+    <!-- Script ປ້ອງກັນການຄັດລອກ ແລະ ຄລິກຂວາ -->
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.ctrlKey && (event.key === 'c' || event.key === 'u' || event.key === 's' || event.key === 'p')) {
+                event.preventDefault();
+                alert('ລະບົບຄວາມປອດໄພ: ຫ້າມຄັດລອກ ຫຼື ບັນທຶກໜ້າຈໍ!');
             }
-            if (e.key === 'PrintScreen') {
-                navigator.clipboard.writeText('');
-                window.showModal('ແຈ້ງເຕືອນຄວາມປອດໄພ', 'ກວດພົບຄວາມພະຍາຍາມບັນທຶກໜ້າຈໍ!', false);
-            }
-        });
-
-        // Window focus / blur privacy shield
-        window.addEventListener('blur', () => {
-            document.getElementById('privacy-shield').style.opacity = '1';
-            document.getElementById('privacy-shield').style.pointerEvents = 'auto';
-        });
-
-        window.addEventListener('focus', () => {
-            document.getElementById('privacy-shield').style.opacity = '0';
-            document.getElementById('privacy-shield').style.pointerEvents = 'none';
         });
     </script>
 </body>
