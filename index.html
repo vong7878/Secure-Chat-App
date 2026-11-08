@@ -36,7 +36,7 @@
                 <h1 class="font-bold text-sm tracking-wide text-pink-200">ແຊັດລັບສອງຄົນ</h1>
                 <p id="partner-status" class="text-[10px] text-pink-400 flex items-center gap-1">
                     <span class="w-1.5 h-1.5 rounded-full bg-slate-500" id="status-dot"></span> 
-                    <span id="status-text">ກຳລັງເຊື່ອມຕໍ່...</span>
+                    <span id="status-text">ພ້ອມໃຊ້ງານ</span>
                 </p>
             </div>
         </div>
@@ -50,7 +50,7 @@
         </div>
     </header>
 
-    <!-- ແຖບສະແດງຂໍ້ຄວາມທີ່ຖືກປັກໝຸດ (Pinned Message Bar) -->
+    <!-- ແຖບປັກໝຸດ -->
     <div id="pinned-banner" class="hidden bg-pink-950/90 border-b border-pink-800/50 px-4 py-2 text-xs text-pink-200 flex justify-between items-center shrink-0 backdrop-blur-md z-10">
         <div class="flex items-center gap-2 truncate">
             <span class="text-pink-400 font-bold">📌 ປັກໝຸດ:</span>
@@ -91,7 +91,6 @@
 
     <!-- ໜ້າຈໍແຊັດ -->
     <div id="chat-screen" class="hidden flex-1 flex flex-col w-full overflow-hidden relative bg-[#200d17]">
-        <!-- ປະຫວັດຂໍ້ຄວາມ -->
         <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 pb-20"></div>
 
         <!-- Pop-up ເມນູແນບໄຟລ໌ -->
@@ -130,7 +129,6 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
@@ -145,7 +143,6 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
 
@@ -179,7 +176,10 @@
                 });
                 localStorage.setItem('active_room_id', roomId);
                 enterChatScreen(roomId);
-            } catch (e) { alert("ສ້າງຫ້ອງບໍ່ໄດ້"); }
+            } catch (e) {
+                console.error(e);
+                alert("ສ້າງຫ້ອງບໍ່ໄດ້: " + e.message);
+            }
         }
 
         window.joinRoom = function() {
@@ -210,7 +210,10 @@
                 }
                 localStorage.setItem('active_room_id', roomId);
                 enterChatScreen(roomId);
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e);
+                if (!isAuto) alert('ເກີດຂໍ້ຜິດพลาดในการເຂົ້າຫ້ອງ');
+            }
         }
 
         function enterChatScreen(roomId) {
@@ -238,7 +241,6 @@
                 const lastSeenObj = data.lastSeen || {};
                 const pinned = data.pinnedMessage;
 
-                // ຈັດການສະແດງແຖບປັກໝຸດ
                 const banner = document.getElementById('pinned-banner');
                 const pinnedText = document.getElementById('pinned-text');
                 if (pinned) {
@@ -322,7 +324,6 @@
                     if (data.type === 'audio') contentHTML = `<audio controls src="${data.url}" class="max-w-full h-10"></audio>`;
                     if (data.type === 'location') contentHTML = `<a href="${data.url}" target="_blank" class="text-pink-200 underline font-bold">📍 ເບິ່ງໂລເຄຊັນໃນແຜນທີ່</a>`;
 
-                    // ສະແດງ Reaction ຖ້າມີ
                     let reactionsHTML = '';
                     if (data.reactions) {
                         for (let dev in data.reactions) {
@@ -343,11 +344,154 @@
                                 <div class="absolute -bottom-2 ${isMe ? 'left-0' : 'right-0'} flex">${reactionsHTML}</div>
                             </div>
                             
-                            <!-- ປຸ່ມເມນູຍ່ອຍ (ລົບ, ປັກໝຸດ, ສະແດງຄວາມຮູ້ສຶກ) -->
                             <div class="flex items-center gap-1 opacity-80 sm:opacity-0 group-hover:opacity-100 transition">
                                 <button onclick="reactMessage('${docId}', '❤️')" title="ຖືກໃຈ">❤️</button>
                                 <button onclick="reactMessage('${docId}', '😂')" title="ຫົວ">😂</button>
                                 <button onclick="pinMessage('${escapeHtml(data.text || 'ໄຟລ໌/ມີເດຍ')}')" title="ປັກໝຸດ">📌</button>
                                 <button onclick="deleteMessage('${docId}')" class="text-red-400" title="ລົບ">🗑️</button>
                             </div>
- 
+                        </div>
+                        <div class="flex items-center text-[9px] text-pink-400/60 mt-1 px-1">
+                            <span>${formatTime(data.createdAt)}</span>
+                            ${seenStatus}
+                        </div>
+                    `;
+                    container.appendChild(msgDiv);
+                });
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+
+        async function markAsRead(docId) {
+            if (!currentRoomId) return;
+            try {
+                await updateDoc(doc(db, "rooms", currentRoomId, "messages", docId), { read: true });
+            } catch (e) {}
+        }
+
+        window.reactMessage = async function(docId, emoji) {
+            if (!currentRoomId) return;
+            const roomRef = doc(db, "rooms", currentRoomId, "messages", docId);
+            try {
+                const snap = await getDoc(roomRef);
+                if (snap.exists()) {
+                    let reactions = snap.data().reactions || {};
+                    reactions[myDeviceId] = emoji;
+                    await updateDoc(roomRef, { reactions: reactions });
+                }
+            } catch (e) {}
+        }
+
+        window.pinMessage = async function(text) {
+            if (!currentRoomId) return;
+            try {
+                await updateDoc(doc(db, "rooms", currentRoomId), { pinnedMessage: text });
+            } catch (e) {}
+        }
+
+        window.unpinMessage = async function() {
+            if (!currentRoomId) return;
+            try {
+                await updateDoc(doc(db, "rooms", currentRoomId), { pinnedMessage: null });
+            } catch (e) {}
+        }
+
+        window.sendMessage = async function(event) {
+            event.preventDefault();
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if (!text || !currentRoomId) return;
+            input.value = '';
+            updateTypingStatus(false);
+
+            await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
+                text: text, type: 'text', deviceId: myDeviceId, read: false, createdAt: serverTimestamp()
+            });
+        }
+
+        window.handleFileUpload = async function(event, type) {
+            const file = event.target.files[0];
+            if (!file || !currentRoomId) return;
+            toggleAttachmentMenu();
+            
+            const storageRef = ref(storage, `rooms/${currentRoomId}/${Date.now()}_${file.name}`);
+            try {
+                alert('ກຳລັງອັບໂຫຼດ...');
+                const snapshot = await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(snapshot.ref);
+
+                let fileType = 'file';
+                if (file.type.startsWith('image/')) fileType = 'image';
+                else if (file.type.startsWith('video/')) fileType = 'video';
+
+                await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
+                    url: url, fileName: file.name, type: fileType, deviceId: myDeviceId, read: false, createdAt: serverTimestamp()
+                });
+            } catch (e) { alert('ອັບໂຫຼດບໍ່ສຳເລັດ'); }
+        }
+
+        window.sendLocation = function() {
+            toggleAttachmentMenu();
+            if (!navigator.geolocation) return alert('ບຣາວເຊີບໍ່ຮອງຮັບໂລເຄຊັນ');
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const mapUrl = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
+                    url: mapUrl, type: 'location', deviceId: myDeviceId, read: false, createdAt: serverTimestamp()
+                });
+            }, () => alert('ບໍ່ສາມາດດຶງໂລເຄຊັນໄດ້'));
+        }
+
+        window.toggleVoiceRecording = async function() {
+            const btn = document.getElementById('mic-btn');
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const storageRef = ref(storage, `rooms/${currentRoomId}/audio_${Date.now()}.webm`);
+                        const snapshot = await uploadBytes(storageRef, audioBlob);
+                        const url = await getDownloadURL(snapshot.ref);
+                        await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
+                            url: url, type: 'audio', deviceId: myDeviceId, read: false, createdAt: serverTimestamp()
+                        });
+                    };
+                    mediaRecorder.start();
+                    isRecording = true;
+                    btn.classList.add('bg-red-600', 'text-white');
+                    btn.innerText = '⏹️';
+                } catch (e) { alert('ບໍ່ສາມາດເຂົ້າເຖິງໄມໂຄຣໂຟນໄດ້'); }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                btn.classList.remove('bg-red-600', 'text-white');
+                btn.innerText = '🎙️';
+            }
+        }
+
+        window.deleteMessage = async function(id) {
+            if (currentRoomId) await deleteDoc(doc(db, "rooms", currentRoomId, "messages", id));
+        }
+
+        window.startCall = function(type) {
+            alert(`📞 ກຳລັງເຊື່ອມຕໍ່ ${type === 'audio' ? 'ໂທສຽງ' : 'ໂທວິດີໂອ'} ຫາກິກຂອງທ່ານ...`);
+        }
+
+        window.toggleAttachmentMenu = function() {
+            document.getElementById('attachment-menu').classList.toggle('hidden');
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function formatTime(timestamp) {
+            if (!timestamp) return 'ກຳລັງສົ່ງ...';
+            return timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+    </script>
+</body>
+</html>
