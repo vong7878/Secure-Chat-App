@@ -93,44 +93,22 @@
     <div id="chat-screen" class="hidden flex-1 flex flex-col w-full overflow-hidden relative bg-[#200d17]">
         <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 pb-20"></div>
 
-        <!-- Pop-up ເມນູແນບໄຟລ໌ -->
-        <div id="attachment-menu" class="hidden absolute bottom-16 left-3 bg-slate-900 border border-pink-900/50 rounded-2xl p-3 shadow-2xl z-20 flex flex-col gap-2 w-48 backdrop-blur-md">
-            <label class="flex items-center gap-3 text-xs text-slate-200 hover:text-pink-400 cursor-pointer p-1.5 rounded-lg hover:bg-pink-950/50">
-                <span>📷 ຖ່າຍຮູບ / ວິດີໂອ</span>
-                <input type="file" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleFileUpload(event, 'media')">
-            </label>
-            <label class="flex items-center gap-3 text-xs text-slate-200 hover:text-pink-400 cursor-pointer p-1.5 rounded-lg hover:bg-pink-950/50">
-                <span>🖼️ ເລືອກຈາກແກເລີລີ</span>
-                <input type="file" accept="image/*,video/*" class="hidden" onchange="handleFileUpload(event, 'media')">
-            </label>
-            <label class="flex items-center gap-3 text-xs text-slate-200 hover:text-pink-400 cursor-pointer p-1.5 rounded-lg hover:bg-pink-950/50">
-                <span>📁 ແນບໄຟລ໌ທົ່ວໄປ</span>
-                <input type="file" class="hidden" onchange="handleFileUpload(event, 'file')">
-            </label>
-            <button onclick="sendLocation()" class="flex items-center gap-3 text-xs text-slate-200 hover:text-pink-400 cursor-pointer p-1.5 rounded-lg hover:bg-pink-950/50 text-left">
-                <span>📍 ສົ່ງໂລເຄຊັນ</span>
-            </button>
-        </div>
-
         <!-- ຟອມສົ່ງຂໍ້ຄວາມ -->
         <div class="p-3 bg-slate-900/90 border-t border-pink-900/40 shrink-0 flex items-center gap-2 backdrop-blur-md">
-            <button type="button" onclick="toggleAttachmentMenu()" class="bg-pink-950/60 hover:bg-pink-900 text-pink-300 p-2.5 rounded-xl transition border border-pink-800/40">➕</button>
+            <button type="button" onclick="sendLocation()" class="bg-pink-950/60 hover:bg-pink-900 text-pink-300 p-2.5 rounded-xl transition border border-pink-800/40" title="ສົ່ງໂລເຄຊັນ">📍</button>
 
             <form id="chat-form" onsubmit="sendMessage(event)" class="flex-1 flex gap-2">
                 <input type="text" id="message-input" placeholder="ພິມຂໍ້ຄວາມ..." autocomplete="off" oninput="updateTypingStatus(true)" onblur="updateTypingStatus(false)" class="flex-1 bg-slate-950 border border-pink-900/50 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-pink-500 text-white placeholder-slate-500">
                 
-                <button type="button" id="mic-btn" onclick="toggleVoiceRecording()" class="bg-pink-950/60 hover:bg-pink-900 text-pink-300 px-3 py-2.5 rounded-xl transition flex items-center justify-center border border-pink-800/40" title="ສົ່ງສຽງ">🎙️</button>
-
                 <button type="submit" class="bg-pink-600 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-medium transition shadow-lg shadow-pink-900/40 flex items-center justify-center shrink-0">🚀</button>
             </form>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (ໃຊ້ສະເພາະ Firestore ຟຣີ 100%) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFYd918wJZDjGL5Lv1B5boB4D5f7DdT3Y",
@@ -144,14 +122,10 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
 
         let currentRoomId = null;
         let unsubscribeMessages = null;
         let unsubscribeRoom = null;
-        let mediaRecorder;
-        let audioChunks = [];
-        let isRecording = false;
 
         let myDeviceId = localStorage.getItem('secure_device_id');
         if (!myDeviceId) {
@@ -318,10 +292,6 @@
                     const isMe = data.deviceId === myDeviceId;
                     
                     let contentHTML = `<p class="select-none">${escapeHtml(data.text || '')}</p>`;
-                    if (data.type === 'image') contentHTML = `<a href="${data.url}" target="_blank"><img src="${data.url}" class="rounded-lg max-h-48 object-cover"></a>`;
-                    if (data.type === 'video') contentHTML = `<video controls src="${data.url}" class="rounded-lg max-h-48"></video>`;
-                    if (data.type === 'file') contentHTML = `<a href="${data.url}" target="_blank" class="underline text-pink-200">📁 ${escapeHtml(data.fileName)}</a>`;
-                    if (data.type === 'audio') contentHTML = `<audio controls src="${data.url}" class="max-w-full h-10"></audio>`;
                     if (data.type === 'location') contentHTML = `<a href="${data.url}" target="_blank" class="text-pink-200 underline font-bold">📍 ເບິ່ງໂລເຄຊັນໃນແຜນທີ່</a>`;
 
                     let reactionsHTML = '';
@@ -347,7 +317,7 @@
                             <div class="flex items-center gap-1 opacity-80 sm:opacity-0 group-hover:opacity-100 transition">
                                 <button onclick="reactMessage('${docId}', '❤️')" title="ຖືກໃຈ">❤️</button>
                                 <button onclick="reactMessage('${docId}', '😂')" title="ຫົວ">😂</button>
-                                <button onclick="pinMessage('${escapeHtml(data.text || 'ໄຟລ໌/ມີເດຍ')}')" title="ປັກໝຸດ">📌</button>
+                                <button onclick="pinMessage('${escapeHtml(data.text || 'ໂລເຄຊັນ')}')" title="ປັກໝຸດ">📌</button>
                                 <button onclick="deleteMessage('${docId}')" class="text-red-400" title="ລົບ">🗑️</button>
                             </div>
                         </div>
@@ -409,29 +379,8 @@
             });
         }
 
-        window.handleFileUpload = async function(event, type) {
-            const file = event.target.files[0];
-            if (!file || !currentRoomId) return;
-            toggleAttachmentMenu();
-            
-            const storageRef = ref(storage, `rooms/${currentRoomId}/${Date.now()}_${file.name}`);
-            try {
-                alert('ກຳລັງອັບໂຫຼດ...');
-                const snapshot = await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(snapshot.ref);
-
-                let fileType = 'file';
-                if (file.type.startsWith('image/')) fileType = 'image';
-                else if (file.type.startsWith('video/')) fileType = 'video';
-
-                await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
-                    url: url, fileName: file.name, type: fileType, deviceId: myDeviceId, read: false, createdAt: serverTimestamp()
-                });
-            } catch (e) { alert('ອັບໂຫຼດບໍ່ສຳເລັດ'); }
-        }
-
         window.sendLocation = function() {
-            toggleAttachmentMenu();
+            if (!currentRoomId) return;
             if (!navigator.geolocation) return alert('ບຣາວເຊີບໍ່ຮອງຮັບໂລເຄຊັນ');
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 const mapUrl = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
@@ -441,46 +390,12 @@
             }, () => alert('ບໍ່ສາມາດດຶງໂລເຄຊັນໄດ້'));
         }
 
-        window.toggleVoiceRecording = async function() {
-            const btn = document.getElementById('mic-btn');
-            if (!isRecording) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
-                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                    mediaRecorder.onstop = async () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const storageRef = ref(storage, `rooms/${currentRoomId}/audio_${Date.now()}.webm`);
-                        const snapshot = await uploadBytes(storageRef, audioBlob);
-                        const url = await getDownloadURL(snapshot.ref);
-                        await addDoc(collection(db, "rooms", currentRoomId, "messages"), {
-                            url: url, type: 'audio', deviceId: myDeviceId, read: false, createdAt: serverTimestamp()
-                        });
-                    };
-                    mediaRecorder.start();
-                    isRecording = true;
-                    btn.classList.add('bg-red-600', 'text-white');
-                    btn.innerText = '⏹️';
-                } catch (e) { alert('ບໍ່ສາມາດເຂົ້າເຖິງໄມໂຄຣໂຟນໄດ້'); }
-            } else {
-                mediaRecorder.stop();
-                isRecording = false;
-                btn.classList.remove('bg-red-600', 'text-white');
-                btn.innerText = '🎙️';
-            }
-        }
-
         window.deleteMessage = async function(id) {
             if (currentRoomId) await deleteDoc(doc(db, "rooms", currentRoomId, "messages", id));
         }
 
         window.startCall = function(type) {
             alert(`📞 ກຳລັງເຊື່ອມຕໍ່ ${type === 'audio' ? 'ໂທສຽງ' : 'ໂທວິດີໂອ'} ຫາກິກຂອງທ່ານ...`);
-        }
-
-        window.toggleAttachmentMenu = function() {
-            document.getElementById('attachment-menu').classList.toggle('hidden');
         }
 
         function escapeHtml(text) {
